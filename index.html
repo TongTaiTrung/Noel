@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>2 Tháng của chúng ta</title>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&family=Dancing+Script:wght@500&display=swap");
+
+      body {
+        margin: 0; background-color: #050505; color: white;
+        font-family: "Montserrat", sans-serif; overflow-x: hidden;
+        cursor: none !important; -webkit-tap-highlight-color: transparent;
+      }
+      a, button, [role="button"], .group, .cursor-pointer { cursor: none !important; }
+      @media (hover: none) and (pointer: coarse) {
+        body { cursor: auto !important; }
+        .desktop-only { display: none !important; }
+      }
+      .cinzel { font-family: "Cinzel", serif; }
+      .handwriting { font-family: "Dancing Script", cursive; }
+
+      #canvas-bg, #canvas-dust { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+      #canvas-bg { z-index: -2; background: radial-gradient(circle at center, #1e0d36 0%, #000000 100%); }
+      #canvas-dust { z-index: 1000; }
+
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      /* Bố cục lộn xộn kiểu Scrapbook */
+      .masonry-container {
+        columns: 1; gap: 2rem; padding: 20px;
+      }
+      @media (min-width: 768px) { .masonry-container { columns: 2; } }
+      @media (min-width: 1024px) { .masonry-container { columns: 3; } }
+
+      .masonry-item {
+        break-inside: avoid;
+        margin-bottom: 3rem;
+        display: block;
+      }
+
+      .border-glow {
+        position: absolute; inset: 0; border-radius: inherit;
+        padding: 1px; background: linear-gradient(45deg, transparent, rgba(244, 114, 182, 0.4), transparent);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor; mask-composite: exclude;
+      }
+
+      .shine-effect {
+        position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+        background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.15), transparent);
+        transform: skewX(-25deg); transition: 0.8s;
+      }
+      .group:hover .shine-effect { left: 150%; }
+
+      .cursor-blink::after {
+        content: "|"; animation: blink 1s step-start infinite;
+        margin-left: 2px; color: #f472b6;
+      }
+      @keyframes blink { 50% { opacity: 0; } }
+      
+      /* Hiệu ứng mờ ảo cho Modal */
+      .modal-blur {
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(40px) saturate(150%);
+        -webkit-backdrop-filter: blur(40px) saturate(150%);
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas-bg"></canvas>
+    <canvas id="canvas-dust"></canvas>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect, useRef, useMemo } = React;
+      const { motion, AnimatePresence, useMotionValue, useTransform, useSpring } = window.Motion;
+
+      const memories = [
+        { id: 1, src: "/textures/img7.jpg", note: "Tấm hình kỷ niệm đầu tiên của hai mình.", date: "21/10/2025", color: "#60a5fa" },
+        { id: 2, src: "/textures/img1.jpg", note: "Những ngày khi chúng ta còn bỡ ngỡ khi bắt chuyện với nhau.", date: "22/10/2025", color: "#f472b6" },
+        { id: 3, src: "/textures/img6.jpg", note: "Lúc ra về nhưng lại không muốn rời xa em.", date: "25/10/2025", color: "#fbbf24" },
+        { id: 4, src: "/textures/img4.jpg", note: "Buổi đi chơi giống như hẹn hò vậy, anh cứ nhớ mãi.", date: "14/11/2025", color: "#a78bfa" },
+        { id: 5, src: "/textures/img8.jpg", note: "Món quà em tặng anh nhân ngày International Men's Day.", date: "19/11/2025", color: "#34d399" },
+        { id: 6, src: "/textures/img9.png", note: "Em lại đến bên anh với một bất ngờ. Có lẽ trước đó anh đã không nói, nhưng món quà của em khiến anh xúc động rất nhiều!", date: "19/11/2025", color: "#f87171" },
+        { id: 7, src: "/textures/img2.jpg", note: "Mỗi giây phút bên em, đối với anh đó đều là những món quà.", date: "20/11/2025", color: "#ec4899" },
+      ];
+
+      const MagicTypewriter = ({ text, isInModal = false }) => {
+        return (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`${isInModal ? 'handwriting text-3xl md:text-4xl text-pink-100' : ''}`}>
+            {text}
+          </motion.div>
+        );
+      };
+
+      const RotatingText = () => {
+        const quotes = useMemo(() => [
+          "Mỗi ngày bên em là một món quà...",
+          "Cảm ơn vì đã là một phần của anh...",
+          "60 ngày qua thật tuyệt vời!",
+          "Hành trình của chúng mình chỉ mới bắt đầu...",
+          "Yêu em nhiều hơn mỗi ngày...",
+        ], []);
+        const [displayText, setDisplayText] = useState("");
+        const [isDeleting, setIsDeleting] = useState(false);
+        const [loopNum, setLoopNum] = useState(0);
+        const [typingSpeed, setTypingSpeed] = useState(100);
+
+        useEffect(() => {
+          const handleType = () => {
+            const i = loopNum % quotes.length;
+            const fullText = quotes[i];
+            setDisplayText(isDeleting ? fullText.substring(0, displayText.length - 1) : fullText.substring(0, displayText.length + 1));
+            setTypingSpeed(isDeleting ? 50 : 100);
+            if (!isDeleting && displayText === fullText) setTimeout(() => setIsDeleting(true), 2000);
+            else if (isDeleting && displayText === "") { setIsDeleting(false); setLoopNum(loopNum + 1); }
+          };
+          const timer = setTimeout(handleType, typingSpeed);
+          return () => clearTimeout(timer);
+        }, [displayText, isDeleting, loopNum, quotes, typingSpeed]);
+
+        return <span className="cursor-blink">{displayText}</span>;
+      };
+
+      const UniverseBackground = ({ isReduced }) => {
+        const particlesRef = useRef([]);
+        const starsRef = useRef([]);
+        useEffect(() => {
+          const canvasBg = document.getElementById("canvas-bg");
+          const canvasDust = document.getElementById("canvas-dust");
+          const ctxBg = canvasBg.getContext("2d");
+          const ctxDust = canvasDust.getContext("2d");
+          let width, height;
+          const resize = () => {
+            width = window.innerWidth; height = window.innerHeight;
+            canvasBg.width = width; canvasBg.height = height;
+            canvasDust.width = width; canvasDust.height = height;
+            starsRef.current = Array.from({ length: 150 }, () => ({ x: Math.random() * width, y: Math.random() * height, size: Math.random() * 1.2, opacity: Math.random(), fadeDir: 0.005 }));
+            particlesRef.current = Array.from({ length: 80 }, () => ({ x: (Math.random() - 0.5) * width * 2, y: (Math.random() - 0.5) * height * 2, z: Math.random() * width, type: Math.random() > 0.85 ? "heart" : "dust", color: Math.random() > 0.5 ? "#ffb6c1" : "#ffffff" }));
+          };
+          window.addEventListener("resize", resize); resize();
+          const drawHeart = (ctx, x, y, size) => {
+            ctx.beginPath(); ctx.moveTo(x, y);
+            ctx.bezierCurveTo(x, y - size / 2, x - size, y - size / 2, x - size, y);
+            ctx.bezierCurveTo(x - size, y + size / 1.5, x, y + size, x, y + size * 1.5);
+            ctx.bezierCurveTo(x, y + size, x + size, y + size / 1.5, x + size, y);
+            ctx.bezierCurveTo(x + size, y - size / 2, x, y - size / 2, x, y); ctx.fill();
+          };
+          let animationFrame;
+          const animate = () => {
+            ctxBg.clearRect(0, 0, width, height);
+            starsRef.current.forEach(s => {
+              ctxBg.beginPath(); ctxBg.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+              ctxBg.fillStyle = `rgba(255, 255, 255, ${s.opacity})`; ctxBg.fill();
+              s.opacity += s.fadeDir; if (s.opacity > 1 || s.opacity < 0.2) s.fadeDir = -s.fadeDir;
+            });
+            ctxDust.clearRect(0, 0, width, height);
+            particlesRef.current.forEach(p => {
+              p.z -= isReduced ? 0.3 : 1.5; if (p.z <= 0) p.z = width;
+              const k = 400 / p.z; const px = width / 2 + p.x * k; const py = height / 2 + p.y * k;
+              const size = (1 - p.z / width) * 5; const opacity = isReduced ? 0.05 : (1 - p.z / width) * 0.6;
+              if (px >= 0 && px <= width && py >= 0 && py <= height) {
+                ctxDust.globalAlpha = opacity; ctxDust.fillStyle = p.color;
+                if (p.type === "heart") drawHeart(ctxDust, px, py, size * 2.5); else { ctxDust.beginPath(); ctxDust.arc(px, py, size, 0, Math.PI * 2); ctxDust.fill(); }
+              }
+            });
+            animationFrame = requestAnimationFrame(animate);
+          };
+          animate(); return () => { window.removeEventListener("resize", resize); cancelAnimationFrame(animationFrame); };
+        }, [isReduced]);
+        return null;
+      };
+
+      const GlowCursor = () => {
+        const mouseX = useMotionValue(-100); const mouseY = useMotionValue(-100);
+        const x = useSpring(mouseX, { damping: 25, stiffness: 300 });
+        const y = useSpring(mouseY, { damping: 25, stiffness: 300 });
+        useEffect(() => {
+          const moveCursor = (e) => { mouseX.set(e.clientX); mouseY.set(e.clientY); };
+          window.addEventListener("mousemove", moveCursor); return () => window.removeEventListener("mousemove", moveCursor);
+        }, []);
+        return (
+          <div className="desktop-only pointer-events-none fixed inset-0 z-[9999]">
+            <motion.div style={{ x, y, translateX: "-50%", translateY: "-50%" }} className="w-2 h-2 bg-white rounded-full mix-blend-difference" />
+            <motion.div style={{ x, y, translateX: "-50%", translateY: "-50%" }} className="w-10 h-10 bg-pink-500/20 rounded-full blur-xl" />
+          </div>
+        );
+      };
+
+      const AliveCard = ({ item, onSelect, index }) => {
+        const [rotation] = useState((Math.random() - 0.5) * 8); // Random nghiêng
+        const springConfig = { stiffness: 100, damping: 15 };
+        const scale = useSpring(1, springConfig);
+        
+        return (
+          <div className="masonry-item">
+            <motion.div
+              layoutId={`card-${item.id}`}
+              initial={{ opacity: 0, scale: 0.8, rotate: rotation }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: "-100px" }}
+              whileHover={{ 
+                scale: 1.05, 
+                rotate: rotation * 0.5, 
+                zIndex: 50,
+                transition: { type: "spring", stiffness: 300 } 
+              }}
+              onClick={() => onSelect(item)}
+              className="relative rounded-2xl overflow-hidden glass-panel border-white/10 cursor-pointer shadow-2xl group"
+            >
+              <div className="border-glow" />
+              <motion.img 
+                layoutId={`img-${item.id}`}
+                src={item.src} 
+                className="w-full h-auto object-cover opacity-80 group-hover:opacity-100 transition-all duration-700" 
+              />
+              <div className="shine-effect" />
+              <div className="p-4 bg-gradient-to-t from-black/90 to-transparent absolute bottom-0 left-0 w-full opacity-0 group-hover:opacity-100 transition-opacity">
+                <p className="cinzel text-pink-400 text-[10px] font-bold">{item.date}</p>
+                <p className="text-[11px] text-white/70 line-clamp-1">{item.note}</p>
+              </div>
+            </motion.div>
+          </div>
+        );
+      };
+
+      const Modal = ({ selected, onClose }) => {
+        if (!selected) return null;
+        return (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[2000] flex items-center justify-center p-4 modal-blur"
+            onClick={onClose}
+          >
+            <motion.div 
+              layoutId={`card-${selected.id}`}
+              className="max-w-5xl w-full glass-panel rounded-[2rem] overflow-hidden flex flex-col md:flex-row shadow-[0_0_100px_rgba(244,114,182,0.1)] border-white/20"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="md:w-3/5 relative bg-black/40">
+                <motion.img 
+                  layoutId={`img-${selected.id}`}
+                  src={selected.src} 
+                  className="w-full h-full object-contain max-h-[70vh] md:max-h-full" 
+                />
+              </div>
+              <div className="md:w-2/5 p-8 md:p-12 flex flex-col justify-center bg-zinc-950/80">
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <h3 className="cinzel text-pink-500 tracking-[0.3em] mb-4 font-bold text-sm">{selected.date}</h3>
+                  <div className="h-[2px] w-12 bg-pink-500/50 mb-8" />
+                  <MagicTypewriter text={selected.note} isInModal={true} />
+                  
+                  <div className="mt-12 flex items-center gap-4 group cursor-pointer" onClick={onClose}>
+                    <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:border-pink-500 transition-colors">
+                        <span className="text-sm">✕</span>
+                    </div>
+                    <span className="text-[10px] uppercase tracking-widest text-white/40 group-hover:text-white transition-colors">Trở về</span>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+          </motion.div>
+        );
+      };
+
+      const App = () => {
+        const [selected, setSelected] = useState(null);
+        return (
+          <>
+            <GlowCursor />
+            <UniverseBackground isReduced={!!selected} />
+            <main className="relative z-10 w-full min-h-screen">
+              <section className="h-[90vh] flex flex-col items-center justify-center text-center px-4">
+                <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.5, ease: "easeOut" }}>
+                  <h1 className="cinzel text-6xl md:text-[9rem] font-bold bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-pink-500/20 mb-4 tracking-tighter">
+                    ETERNAL LOVE
+                  </h1>
+                  <div className="text-pink-300 tracking-[0.4em] text-xs md:text-xl font-medium mb-12 h-[30px] opacity-80">
+                    <RotatingText />
+                  </div>
+                  <motion.div 
+                    animate={{ opacity: [0.2, 0.5, 0.2], y: [0, 5, 0] }} 
+                    transition={{ repeat: Infinity, duration: 3 }}
+                    className="text-[10px] uppercase tracking-[1.5em] mt-20"
+                  >
+                    Mỗi mảnh ghép là một kỷ niệm
+                  </motion.div>
+                </motion.div>
+              </section>
+
+              <section className="max-w-7xl mx-auto px-4 md:px-10 pb-40">
+                <div className="masonry-container">
+                  {memories.map((item, index) => (
+                    <AliveCard key={item.id} item={item} index={index} onSelect={setSelected} />
+                  ))}
+                </div>
+              </section>
+            </main>
+
+            <AnimatePresence>
+              {selected && <Modal selected={selected} onClose={() => setSelected(null)} />}
+            </AnimatePresence>
+          </>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
