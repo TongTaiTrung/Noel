@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Chuyện tình của chúng mình</title>
+    
+    <!-- Libraries -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Fonts -->
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Montserrat:wght@300;400;500;600&family=Dancing+Script:wght@500;700&family=Pinyon+Script&display=swap");
+
+      :root {
+        --primary: #f472b6;
+        --secondary: #c084fc;
+      }
+
+      body {
+        margin: 0;
+        background-color: #000;
+        color: white;
+        font-family: "Montserrat", sans-serif;
+        overflow-x: hidden; /* Hide horizontal scroll */
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar { width: 0px; } /* Hide scrollbar for immersion */
+      
+      .cinzel { font-family: "Cinzel", serif; }
+      .handwriting { font-family: "Dancing Script", cursive; }
+      .fancy-script { font-family: "Pinyon Script", cursive; }
+
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      #canvas-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 0;
+        outline: none;
+      }
+
+      .scroll-content {
+        height: 600vh; /* Create fake height for scrolling */
+        width: 100%;
+        position: relative;
+        z-index: 10;
+        pointer-events: none; /* Let clicks pass through to canvas */
+      }
+
+      .ui-layer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 20;
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .pointer-events-auto { pointer-events: auto; }
+
+      /* Animations */
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+      }
+      .animate-float { animation: float 4s ease-in-out infinite; }
+      
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect, useRef, useMemo } = React;
+      const { motion, AnimatePresence } = window.Motion;
+
+      // --- Dữ liệu kỷ niệm ---
+      const memories = [
+        { id: 1, src: "/textures/img7.jpg", note: "Tấm hình kỷ niệm đầu tiên của hai mình.", date: "21/10/2025", color: "#60a5fa" },
+        { id: 2, src: "/textures/img1.jpg", note: "Những ngày khi chúng ta còn bỡ ngỡ khi bắt chuyện với nhau.", date: "22/10/2025", color: "#f472b6" },
+        { id: 3, src: "/textures/img6.jpg", note: "Lúc ra về nhưng lại không muốn rời xa em.", date: "25/10/2025", color: "#fbbf24" },
+        { id: 4, src: "/textures/img4.jpg", note: "Buổi đi chơi giống như hẹn hò vậy, anh cứ nhớ mãi.", date: "14/11/2025", color: "#a78bfa" },
+        { id: 5, src: "/textures/img8.jpg", note: "Món quà em tặng anh nhân ngày International Men's Day.", date: "19/11/2025", color: "#34d399" },
+        { id: 6, src: "/textures/img9.png", note: "Em lại đến bên anh với một bất ngờ. Món quà khiến anh xúc động rất nhiều!", date: "19/11/2025", color: "#f87171" },
+        { id: 7, src: "/textures/img2.jpg", note: "Mỗi giây phút bên em, đối với anh đó đều là những món quà.", date: "20/11/2025", color: "#ec4899" },
+      ];
+
+      // --- Three.js Component (The 3D Tunnel) ---
+      const ThreeScene = ({ items, onSelect, scrollProgress }) => {
+        const mountRef = useRef(null);
+        const sceneRef = useRef(null);
+        const cameraRef = useRef(null);
+        const rendererRef = useRef(null);
+        const objectsRef = useRef([]);
+        const starGeoRef = useRef(null);
+        
+        // Settings
+        const Z_START = -5;
+        const Z_SPACING = 15; // Distance between photos
+        
+        useEffect(() => {
+          // 1. Init Scene
+          const scene = new THREE.Scene();
+          scene.fog = new THREE.FogExp2(0x000000, 0.035); // Add mystique fog
+          sceneRef.current = scene;
+
+          const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+          cameraRef.current = camera;
+          
+          const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+          renderer.setSize(window.innerWidth, window.innerHeight);
+          renderer.setPixelRatio(window.devicePixelRatio);
+          mountRef.current.appendChild(renderer.domElement);
+          rendererRef.current = renderer;
+
+          // 2. Add Lights
+          const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+          scene.add(ambientLight);
+          const pointLight = new THREE.PointLight(0xff00ff, 1, 100);
+          pointLight.position.set(0, 0, 10);
+          scene.add(pointLight);
+
+          // 3. Create Starfield
+          const starGeometry = new THREE.BufferGeometry();
+          const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.05 });
+          const starVertices = [];
+          for(let i=0; i<6000; i++) {
+            const x = (Math.random() - 0.5) * 100;
+            const y = (Math.random() - 0.5) * 100;
+            const z = (Math.random() - 0.5) * 100 - 50;
+            starVertices.push(x,y,z);
+          }
+          starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+          const stars = new THREE.Points(starGeometry, starMaterial);
+          starGeoRef.current = stars;
+          scene.add(stars);
+
+          // 4. Create Memories (Planes)
+          const loader = new THREE.TextureLoader();
+          
+          items.forEach((item, index) => {
+            // Placeholder texture logic if load fails can be handled by manager, but for simplicity:
+            loader.load(item.src, (texture) => {
+              const aspect = texture.image.width / texture.image.height;
+              const height = 4; 
+              const width = height * aspect;
+              
+              const geometry = new THREE.PlaneGeometry(width, height);
+              const material = new THREE.MeshBasicMaterial({ 
+                map: texture, 
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.9
+              });
+              
+              const mesh = new THREE.Mesh(geometry, material);
+              
+              // Position Logic: Zigzag tunnel
+              mesh.position.z = Z_START - (index * Z_SPACING);
+              mesh.position.x = (index % 2 === 0 ? -1 : 1) * 3; // Alternate left/right
+              mesh.position.y = Math.random() * 2 - 1; // Slight random Y
+              
+              // Rotate slightly towards center
+              mesh.rotation.y = (index % 2 === 0 ? 0.3 : -0.3);
+              mesh.rotation.z = (Math.random() - 0.5) * 0.1;
+
+              mesh.userData = { id: item.id, item: item }; // Store data for raycaster
+              
+              // Add a border/glow (simple child mesh)
+              const borderGeo = new THREE.PlaneGeometry(width + 0.2, height + 0.2);
+              const borderMat = new THREE.MeshBasicMaterial({ color: item.color || 0xffffff, side: THREE.BackSide });
+              const border = new THREE.Mesh(borderGeo, borderMat);
+              border.position.z = -0.01;
+              mesh.add(border);
+
+              // Add Text Label below image (CanvasTexture)
+              // Simplified: Just add mesh to scene
+              scene.add(mesh);
+              objectsRef.current.push(mesh);
+            });
+          });
+
+          // 5. Interaction (Raycaster)
+          const raycaster = new THREE.Raycaster();
+          const mouse = new THREE.Vector2();
+
+          const onClick = (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(objectsRef.current);
+            if (intersects.length > 0) {
+              const clickedItem = intersects[0].object.userData.item;
+              if (clickedItem) onSelect(clickedItem);
+            }
+          };
+          window.addEventListener('click', onClick);
+
+          // 6. Animation Loop
+          const animate = () => {
+            requestAnimationFrame(animate);
+            
+            // Float stars
+            if (starGeoRef.current) {
+               starGeoRef.current.rotation.z += 0.0005;
+            }
+
+            // Float images
+            objectsRef.current.forEach((obj, i) => {
+               obj.position.y += Math.sin(Date.now() * 0.001 + i) * 0.002;
+            });
+
+            renderer.render(scene, camera);
+          };
+          animate();
+
+          // Cleanup
+          return () => {
+            window.removeEventListener('click', onClick);
+            if (mountRef.current) mountRef.current.innerHTML = '';
+          };
+        }, []);
+
+        // Update Camera on Scroll
+        useEffect(() => {
+          if (cameraRef.current) {
+            // Map scroll (0 to 1) to Z position
+            // We want to travel from z=0 to past the last image
+            const totalDistance = items.length * Z_SPACING + 10;
+            const targetZ = -(scrollProgress * totalDistance);
+            
+            // Smooth look
+            cameraRef.current.position.z = targetZ;
+            
+            // Subtle camera rotation based on scroll for "flying" feel
+            cameraRef.current.rotation.z = Math.sin(scrollProgress * Math.PI) * 0.05;
+            cameraRef.current.position.x = Math.sin(scrollProgress * Math.PI * 2) * 1;
+          }
+        }, [scrollProgress, items]);
+
+        // Handle Resize
+        useEffect(() => {
+            const handleResize = () => {
+                if(cameraRef.current && rendererRef.current) {
+                    cameraRef.current.aspect = window.innerWidth / window.innerHeight;
+                    cameraRef.current.updateProjectionMatrix();
+                    rendererRef.current.setSize(window.innerWidth, window.innerHeight);
+                }
+            }
+            window.addEventListener('resize', handleResize);
+            return () => window.removeEventListener('resize', handleResize);
+        }, []);
+
+        return <div ref={mountRef} id="canvas-container" />;
+      };
+
+      // --- Components Giao diện ---
+      const HeroOverlay = ({ scrollProgress }) => {
+        // Fade out hero as we scroll down
+        const opacity = Math.max(0, 1 - scrollProgress * 5); 
+        
+        return (
+          <div className="fixed top-0 left-0 w-full h-full flex flex-col items-center justify-center pointer-events-none transition-opacity duration-300" style={{ opacity }}>
+             <motion.div 
+               initial={{ scale: 0.8, opacity: 0 }}
+               animate={{ scale: 1, opacity: 1 }}
+               transition={{ duration: 1.5 }}
+               className="text-center"
+             >
+                <h2 className="fancy-script text-4xl text-pink-400 mb-2">Our Journey</h2>
+                <h1 className="cinzel text-6xl md:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-pink-500/50">TIMELINE</h1>
+                <div className="mt-8 flex flex-col items-center gap-2">
+                    <span className="text-xs uppercase tracking-[0.3em] text-white/50">Cuộn chuột để bắt đầu hành trình</span>
+                    <div className="w-[1px] h-10 bg-gradient-to-b from-pink-500 to-transparent animate-pulse" />
+                </div>
+             </motion.div>
+          </div>
+        );
+      };
+
+      const ProgressUI = ({ scrollProgress }) => {
+          return (
+             <div className="fixed bottom-8 left-8 z-30 mix-blend-difference pointer-events-none hidden md:block">
+                 <div className="cinzel text-4xl font-bold text-white/20">
+                    {Math.round(scrollProgress * 100)}%
+                 </div>
+                 <div className="text-[10px] text-white/40 uppercase tracking-widest">Journey Completed</div>
+             </div>
+          );
+      }
+
+      // --- Modal Chi Tiết (Tái sử dụng phiên bản đẹp) ---
+      const Modal = ({ item, onClose }) => {
+        if (!item) return null;
+        return (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-xl bg-black/60 pointer-events-auto"
+            onClick={onClose}
+          >
+            <motion.div 
+              layoutId={`modal-${item.id}`}
+              className="bg-[#050505] border border-white/10 p-1 md:p-2 rounded-2xl shadow-2xl max-w-4xl w-full flex flex-col md:flex-row overflow-hidden"
+              onClick={e => e.stopPropagation()}
+              initial={{ y: 50, scale: 0.9 }} animate={{ y: 0, scale: 1 }}
+            >
+               <div className="md:w-1/2 bg-black relative">
+                  <img src={item.src} className="w-full h-full object-cover" />
+               </div>
+               <div className="md:w-1/2 p-8 flex flex-col justify-center">
+                  <h3 className="cinzel text-pink-500 text-2xl mb-4">{item.date}</h3>
+                  <div className="w-12 h-[1px] bg-white/20 mb-6"></div>
+                  <p className="handwriting text-3xl text-gray-200 leading-relaxed">"{item.note}"</p>
+                  <button onClick={onClose} className="mt-12 text-xs uppercase tracking-widest text-white/40 hover:text-white transition-colors text-left">
+                     ← Quay lại hành trình
+                  </button>
+               </div>
+            </motion.div>
+          </motion.div>
+        );
+      };
+
+      // --- Main App ---
+      const App = () => {
+        const [scrollProgress, setScrollProgress] = useState(0);
+        const [selectedItem, setSelectedItem] = useState(null);
+
+        useEffect(() => {
+            const handleScroll = () => {
+                const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+                const current = window.scrollY;
+                const progress = current / totalScroll;
+                setScrollProgress(Math.min(1, Math.max(0, progress)));
+            };
+            window.addEventListener('scroll', handleScroll);
+            return () => window.removeEventListener('scroll', handleScroll);
+        }, []);
+
+        return (
+          <>
+            <div className="scroll-content"></div> {/* Element giả để tạo scrollbar */}
+            
+            <ThreeScene 
+                items={memories} 
+                onSelect={setSelectedItem} 
+                scrollProgress={scrollProgress}
+            />
+
+            <div className="ui-layer">
+                 <HeroOverlay scrollProgress={scrollProgress} />
+                 <ProgressUI scrollProgress={scrollProgress} />
+            </div>
+
+            <AnimatePresence>
+                {selectedItem && <Modal item={selectedItem} onClose={() => setSelectedItem(null)} />}
+            </AnimatePresence>
+          </>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
