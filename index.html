@@ -80,7 +80,7 @@
         * { cursor: none !important; }
         .cursor-dot, .cursor-outline {
           position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
-          border-radius: 50%; z-index: 1000000000; pointer-events: none; will-change: transform;
+          border-radius: 50%; z-index: 100000000; pointer-events: none; will-change: transform;
         }
         .cursor-dot { width: 8px; height: 8px; background-color: var(--accent-color); }
         .cursor-outline {
@@ -130,7 +130,7 @@
         text-align: center; min-height: 1.5em;
       }
 
-      /* --- STORY CARD --- */
+      /* --- STORY CARD (FIXED FLIP) --- */
       .story-section { perspective: 1500px; }
       .story-card {
         background: var(--card-bg);
@@ -139,27 +139,25 @@
         box-shadow: 0 30px 60px rgba(255, 143, 163, 0.2);
         max-width: 800px; width: 100%;
         border: 1px solid rgba(255, 255, 255, 0.5);
+        
+        /* 3D Config */
         transform-style: preserve-3d;
         transform-origin: center top; 
         will-change: transform, opacity;
+        
+        /* Trạng thái ban đầu */
         opacity: 0;
-        transform: translateY(50px);
-      }
-      
-      @media (max-width: 768px) {
-          .story-card {
-              transition: transform 0.6s ease-out, opacity 0.6s ease-out;
-          }
-      }
-
-      @media (min-width: 769px) {
-        .story-card { transform: rotateX(-90deg); }
+        transform: rotateX(-90deg); /* Mặc định ẩn bằng cách xoay */
+        
+        /* QUAN TRỌNG: Không set transition cho transform để JS điều khiển mượt theo scroll */
+        transition: none !important; 
       }
       
       .story-line {
         display: block; margin-bottom: 15px; font-size: 1.2rem;
         opacity: 0; transform: translateY(20px);
         will-change: transform, opacity;
+        transition: none !important;
       }
 
       /* --- GALLERY --- */
@@ -206,7 +204,8 @@
         box-shadow: 0 0 50px rgba(255, 143, 163, 0.2);
         will-change: transform;
       }
-      #days-count { font-size: clamp(4rem, 12vw, 7rem); font-weight: 700; color: var(--accent-color); }
+      #days-count { font-size: clamp(4rem, 12vw, 7rem); font-weight: 700; color: var(--accent-color); display: inline-block;}
+      .number-wrapper { display: inline-block; }
 
       /* --- FINAL --- */
       .heart-btn {
@@ -454,21 +453,18 @@
         }).join("");
 
       // --- SPARK EFFECT FUNCTION ---
-      // Hàm tạo tia lửa ngay tại vị trí con trỏ
       function createTyperSpark(element) {
         if (!element) return;
         const rect = element.getBoundingClientRect();
-        // Lấy vị trí tâm của con trỏ
         const x = rect.left + rect.width / 2;
         const y = rect.top + rect.height / 2;
 
-        // Tạo 1-2 hạt tia lửa
         for (let i = 0; i < 2; i++) {
             const spark = document.createElement('div');
             spark.classList.add('spark');
             spark.style.left = x + 'px';
             spark.style.top = y + 'px';
-            spark.style.backgroundColor = isMobile ? '#ff4d6d' : (i % 2 === 0 ? '#ffeb3b' : '#ff4d6d'); // Màu vàng hoặc hồng
+            spark.style.backgroundColor = isMobile ? '#ff4d6d' : (i % 2 === 0 ? '#ffeb3b' : '#ff4d6d'); 
             document.body.appendChild(spark);
 
             anime({
@@ -484,7 +480,7 @@
         }
       }
 
-      // --- MODAL WITH TYPEWRITER (NO SHAKE, ADD SPARKS) ---
+      // --- MODAL WITH TYPEWRITER ---
       const modalEl = document.getElementById('image-modal');
       const modalOverlay = document.querySelector('.modal-overlay');
       const modalContent = document.querySelector('.modal-content');
@@ -528,7 +524,6 @@
                     modalCaption.textContent += captionText.charAt(i);
                     i++;
                     
-                    // KÍCH HOẠT TIA LỬA TẠI CON TRỎ MODAL
                     const cursor = document.querySelector('.modal-cursor');
                     createTyperSpark(cursor);
 
@@ -597,7 +592,7 @@
       }
       createFloatingHearts();
 
-      // --- TYPEWRITER (HERO SECTION WITH SPARKS) ---
+      // --- TYPEWRITER (HERO SECTION) ---
       function typeWriter(element, text, speed, callback, cursorElement) {
         let i = 0;
         element.textContent = "";
@@ -606,7 +601,6 @@
           if (i < text.length) {
             element.textContent += text.charAt(i);
             i++;
-            // KÍCH HOẠT TIA LỬA TẠI CON TRỎ HERO
             createTyperSpark(cursorElement);
             setTimeout(type, speed);
           } else {
@@ -670,7 +664,7 @@
         loop();
       }
 
-      // --- SCROLL EFFECTS ---
+      // --- SCROLL EFFECTS (FIXED MOBILE FLIP) ---
       const blob1 = document.getElementById("blob1");
       const blob2 = document.getElementById("blob2");
       const storySection = document.getElementById("story");
@@ -697,30 +691,22 @@
             let fraction = (windowHeight - rect.top) / (windowHeight + rect.height);
             fraction = Math.max(0, Math.min(1, fraction));
 
-            if (!isMobile) {
-                let rotation, opacity, translateY;
-                if (fraction <= 0.5) {
-                    const progress = fraction * 2; 
-                    rotation = -90 + (90 * progress);
-                    opacity = progress;
-                    translateY = 50 * (1 - progress);
-                } else {
-                    const progress = (fraction - 0.5) * 2;
-                    rotation = 0 + (90 * progress);
-                    opacity = 1 - progress; 
-                    translateY = -50 * progress;
-                }
-                storyCard.style.transform = `rotateX(${rotation}deg) translate3d(0, ${translateY}px, 0)`;
-                storyCard.style.opacity = Math.min(1, opacity + 0.2); 
+            // Unified logic for PC & Mobile to ensure flip works
+            let rotation, opacity, translateY;
+            if (fraction <= 0.5) {
+                const progress = fraction * 2; 
+                rotation = -90 + (90 * progress);
+                opacity = progress;
+                translateY = 50 * (1 - progress);
             } else {
-                if (fraction > 0.05 && fraction < 1.1) {
-                    storyCard.style.opacity = 1;
-                    storyCard.style.transform = "translateY(0)";
-                } else {
-                    storyCard.style.opacity = 0;
-                    storyCard.style.transform = "translateY(50px)";
-                }
+                const progress = (fraction - 0.5) * 2;
+                rotation = 0 + (90 * progress);
+                opacity = 1 - progress; 
+                translateY = -50 * progress;
             }
+            // Use translate3d for GPU accel
+            storyCard.style.transform = `rotateX(${rotation}deg) translate3d(0, ${translateY}px, 0)`;
+            storyCard.style.opacity = Math.min(1, opacity + 0.2); 
 
             storyLines.forEach((line, index) => {
                 const triggerPoint = 0.2 + (index * 0.05);
@@ -764,14 +750,39 @@
                     });
                     observer.unobserve(entry.target);
                 }
+                
+                // --- COUNTER ANIMATION ---
                 if(entry.target.id === "counter") {
                     const today = new Date();
                     const diff = Math.ceil(Math.abs(today - startDate) / (1000 * 60 * 60 * 24));
+                    
                     anime({
-                        targets: '#days-count', innerHTML: [0, diff], round: 1, duration: 2000, easing: 'easeOutExpo'
+                        targets: '#days-count', 
+                        innerHTML: [0, diff], 
+                        round: 1, 
+                        duration: 2500, 
+                        easing: 'easeOutExpo'
                     });
+
+                    anime({
+                        targets: '.number-wrapper', 
+                        scale: [0.5, 1],
+                        easing: 'spring(1, 80, 10, 0)'
+                    });
+
+                    anime({
+                        targets: '.number-wrapper',
+                        translateY: [-5, 5],
+                        direction: 'alternate',
+                        loop: true,
+                        duration: 2000,
+                        easing: 'easeInOutSine',
+                        delay: 2000
+                    });
+
                     observer.unobserve(entry.target);
                 }
+
                 if(entry.target.id === "final") {
                     anime({ targets: '.final-text', opacity: [0,1], translateY: [20,0], duration: 800 });
                     anime({ targets: '#heart-btn', opacity: [0,1], scale: [0,1], delay: 300, duration: 1000 });
