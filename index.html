@@ -225,6 +225,9 @@
       @media (min-width: 600px) {
         .gallery-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2.5rem; }
       }
+      @media (max-width: 599px) {
+        .gallery-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      }
 
       .memory-card {
         background: #fff;
@@ -543,13 +546,6 @@
                 <span class="time-value" id="minutes-count">00</span>
                 <span class="time-label">Phút</span>
             </div>
-            
-            <div class="timer-divider"><i class="fas fa-heart" style="font-size: 1rem; opacity:0.6"></i></div>
-            
-             <div class="time-box">
-                <span class="time-value" id="seconds-count">00</span>
-                <span class="time-label">Giây</span>
-            </div>
         </div>
       </div>
     </section>
@@ -561,9 +557,6 @@
       <button id="heart-btn" class="heart-btn" style="opacity: 0">
         <i class="fas fa-heart" style="color: #ff4d6d"></i>
       </button>
-      <p class="click-hint" style="font-size: 0.9rem; color: #999; margin-top:10px; opacity:0">
-        (Nhấn vào tim nhé)
-      </p>
     </section>
 
     <div class="modal" id="image-modal">
@@ -930,7 +923,6 @@
             document.getElementById('days-count').innerText = days;
             document.getElementById('hours-count').innerText = hours < 10 ? '0' + hours : hours;
             document.getElementById('minutes-count').innerText = minutes < 10 ? '0' + minutes : minutes;
-            document.getElementById('seconds-count').innerText = seconds < 10 ? '0' + seconds : seconds;
         }
       }
 
