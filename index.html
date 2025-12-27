@@ -169,7 +169,7 @@
         background: var(--card-bg);
         padding: clamp(2rem, 5vw, 4rem); border-radius: 40px;
         backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px); /* Safari support */
+        -webkit-backdrop-filter: blur(20px);
         box-shadow: 0 30px 60px rgba(255, 143, 163, 0.2);
         max-width: 800px; width: 100%;
         border: 1px solid rgba(255, 255, 255, 0.5);
@@ -190,7 +190,6 @@
               transform: rotateX(0deg) translateY(0);
               opacity: 1;
           }
-          /* Disable heavy blur on mobile for performance */
           .story-card { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
       }
       @media (min-width: 769px) {
@@ -300,31 +299,41 @@
         animation: heartbeat 1.5s infinite; cursor: pointer; z-index: 100;
       }
 
-      /* --- POLAROID MODAL (Fixed Visibility) --- */
+      /* --- POLAROID MODAL (Fixed Logic) --- */
       .modal {
         position: fixed; inset: 0; display: flex; justify-content: center;
         align-items: center; z-index: 100002; 
-        pointer-events: none; opacity: 0;
-        visibility: hidden; /* Fix: Hide completely when closed */
-        transition: visibility 0s 0.4s, opacity 0.4s ease; /* Delay visibility change */
-      }
-      .modal.active {
-        opacity: 1; pointer-events: auto; visibility: visible;
-        transition: opacity 0.4s ease;
+        
+        /* Ẩn mặc định, không chặn click */
+        visibility: hidden; 
+        opacity: 0;
+        pointer-events: none; 
+        
+        /* Không dùng transition ở đây để tránh conflict với WAAPI */
       }
       
+      .modal.active {
+        /* Trạng thái mở */
+        visibility: visible;
+        opacity: 1;
+        pointer-events: auto;
+      }
+
       .modal-overlay {
         position: absolute; inset: 0; background: rgba(0, 0, 0, 0.85);
         backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-        opacity: 0;
+        opacity: 0; /* WAAPI sẽ điều khiển cái này */
       }
+      
       .modal-content {
         position: relative; background: #fff; padding: 15px;
         border-radius: 4px; width: 90%; max-width: 500px;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        transform-origin: center center; opacity: 0;
+        transform-origin: center center; 
+        opacity: 0; /* WAAPI sẽ điều khiển cái này */
         display: flex; flex-direction: column; max-height: 90vh;
       }
+      
       .modal-content::before {
         content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
         width: 100px; height: 35px;
@@ -531,7 +540,7 @@
           `;
         }).join("");
 
-      // --- HELPER: Wrap letters ---
+      // --- HELPER: Wrap letters for Anime.js ---
       function wrapText(element) {
           element.innerHTML = element.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
       }
@@ -609,7 +618,7 @@
       }
       setTimeout(animateSubtitle, 2000); 
 
-      // --- SPARK EFFECT ---
+      // --- SPARK EFFECT (WAAPI) ---
       function createTyperSpark(element) {
         if (!element) return;
         const rect = element.getBoundingClientRect();
@@ -624,20 +633,20 @@
             spark.style.backgroundColor = isMobile ? '#ff4d6d' : (i % 2 === 0 ? '#ffeb3b' : '#ff4d6d'); 
             document.body.appendChild(spark);
 
-            anime({
-                targets: spark,
-                translateX: () => anime.random(-15, 15),
-                translateY: () => anime.random(-15, 15),
-                scale: [1, 0],
-                opacity: [1, 0],
+            // WAAPI Animation
+            const animation = spark.animate([
+                { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                { transform: `translate(${anime.random(-15, 15)}px, ${anime.random(-15, 15)}px) scale(0)`, opacity: 0 }
+            ], {
                 duration: anime.random(300, 500),
-                easing: 'easeOutExpo',
-                complete: () => spark.remove()
+                easing: 'cubic-bezier(0.19, 1, 0.22, 1)', // easeOutExpo
             });
+
+            animation.onfinish = () => spark.remove();
         }
       }
 
-      // --- MODAL LOGIC (FIXED) ---
+      // --- MODAL LOGIC (FIXED WITH WAAPI) ---
       const modalEl = document.getElementById('image-modal');
       const modalOverlay = document.querySelector('.modal-overlay');
       const modalContent = document.querySelector('.modal-content');
@@ -645,7 +654,7 @@
       const modalCaption = document.getElementById('modal-caption');
       
       let typeInterval; 
-      let isModalAnimating = false; // Prevent double clicks
+      let isModalAnimating = false; 
 
       function openModal(imgSrc, captionText) {
         if (isModalAnimating) return;
@@ -654,33 +663,30 @@
         modalImg.src = imgSrc;
         modalCaption.innerText = ""; 
         
-        modalEl.classList.add('active'); // Use class for visibility
+        // CSS class handles pointer-events and visibility 'states', but we use WAAPI for visual transition
+        modalEl.classList.add('active'); 
         
-        const randomRotate = anime.random(-4, 4);
+        // Reset styles for animation start
+        modalOverlay.style.opacity = 0;
+        modalContent.style.opacity = 0;
 
-        anime.timeline({ 
-            easing: 'easeOutExpo', 
-            duration: 800,
-            complete: () => { isModalAnimating = false; }
-        })
-        .add({
-            targets: modalOverlay,
-            opacity: [0, 1],
-            duration: 400
-        })
-        .add({
-            targets: modalContent,
-            scale: [0.6, 1],
-            opacity: [0, 1],
-            rotate: [`${randomRotate*3}deg`, `${randomRotate}deg`], 
-            translateY: [-50, 0],
-            translateX: 0,
-            easing: 'spring(1, 80, 10, 0)', 
-        }, '-=200');
+        // Use WAAPI for simple fade in
+        const overlayAnim = modalOverlay.animate([
+            { opacity: 0 }, { opacity: 1 }
+        ], { duration: 400, easing: 'ease-out', fill: 'forwards' });
+
+        const randomRotate = Math.random() * 8 - 4; // -4 to 4 deg
+        const contentAnim = modalContent.animate([
+            { opacity: 0, transform: `scale(0.6) translateY(-50px) rotate(${randomRotate*3}deg)` },
+            { opacity: 1, transform: `scale(1) translateY(0) rotate(${randomRotate}deg)` }
+        ], { duration: 800, easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)', fill: 'forwards' }); // Spring-ish
+
+        Promise.all([overlayAnim.finished, contentAnim.finished]).then(() => {
+            isModalAnimating = false;
+        });
 
         clearInterval(typeInterval);
         
-        // Start typing
         setTimeout(() => {
             let i = 0;
             typeInterval = setInterval(() => {
@@ -697,28 +703,30 @@
       }
 
       function closeModal() {
-        if (isModalAnimating) return; // Wait for open anim to finish if clicked too fast
-        // Force stop typing
+        if (isModalAnimating) return;
         clearInterval(typeInterval);
         isModalAnimating = true;
 
-        const tl = anime.timeline({
-            easing: 'easeInBack',
-            duration: 400,
-            complete: () => {
-                modalEl.classList.remove('active'); // Hide via class
-                modalImg.src = ""; 
-                isModalAnimating = false;
-            }
+        const overlayAnim = modalOverlay.animate([
+            { opacity: 1 }, { opacity: 0 }
+        ], { duration: 300, easing: 'ease-in', fill: 'forwards' });
+
+        const contentAnim = modalContent.animate([
+            { opacity: 1, transform: 'scale(1) translateY(0)' },
+            { opacity: 0, transform: 'scale(0.8) translateY(50px)' }
+        ], { duration: 300, easing: 'ease-in', fill: 'forwards' });
+
+        Promise.all([overlayAnim.finished, contentAnim.finished]).then(() => {
+            modalEl.classList.remove('active'); // Hide via class
+            modalImg.src = ""; 
+            isModalAnimating = false;
         });
-        tl.add({ targets: modalContent, scale: 0.8, opacity: 0, translateY: 50 })
-          .add({ targets: modalOverlay, opacity: 0 }, '-=200');
       }
 
-      // --- FLOATING HEARTS ---
+      // --- FLOATING HEARTS (WAAPI) ---
       function createFloatingHearts() {
         const container = document.getElementById('hearts-container');
-        const heartCount = isMobile ? 12 : 30; // Reduce count for mobile performance
+        const heartCount = isMobile ? 12 : 30; 
         for (let i = 0; i < heartCount; i++) {
             const heart = document.createElement('div');
             heart.classList.add('bg-heart', 'fas', 'fa-heart');
@@ -727,48 +735,47 @@
             heart.style.left = `${Math.random() * 100}vw`;
             heart.style.top = `${Math.random() * 100 + 100}vh`; 
             container.appendChild(heart);
-            anime({
-                targets: heart,
-                translateY: function() { return -1 * (Math.random() * 1000 + 800) },
-                translateX: function() { return anime.random(-50, 50); },
-                opacity: [{ value: 0.6, duration: 100 }, { value: 0, duration: 2000, delay: 3000 }],
-                rotate: function() { return anime.random(-45, 45); },
-                duration: function() { return anime.random(5000, 10000); },
-                delay: function() { return anime.random(0, 5000); },
-                loop: true,
+            
+            const duration = Math.random() * 5000 + 5000;
+            const delay = Math.random() * 5000;
+            
+            heart.animate([
+                { transform: `translateY(0) rotate(${Math.random() * -45}deg)`, opacity: 0.6 },
+                { transform: `translateY(${-1 * (Math.random() * 1000 + 800)}px) rotate(${Math.random() * 45}deg)`, opacity: 0 }
+            ], {
+                duration: duration,
+                delay: delay,
+                iterations: Infinity,
                 easing: 'linear'
             });
         }
       }
       createFloatingHearts();
 
-      // --- SCROLL EFFECTS (PERFORMANCE OPTIMIZED) ---
+      // --- SCROLL EFFECTS ---
       const blob1 = document.getElementById("blob1");
       const blob2 = document.getElementById("blob2");
       const storySection = document.getElementById("story");
       const storyCard = document.querySelector(".story-card");
+      const storyLines = document.querySelectorAll(".story-line");
       const progressBar = document.getElementById("scroll-progress");
 
       function handleScrollEffects() {
         const scrollY = window.scrollY;
-        
-        // Progress Bar
-        const docHeight = document.body.scrollHeight - window.innerHeight;
+        const windowHeight = window.innerHeight;
+        const docHeight = document.body.scrollHeight - windowHeight;
         if(docHeight > 0) {
             progressBar.style.width = `${(scrollY / docHeight) * 100}%`;
         }
         
-        // Parallax only if not mobile to save CPU
+        // Parallax - only on desktop for perf
         if (!isMobile) {
             blob1.style.transform = `translate3d(0, ${scrollY * 0.2}px, 0)`;
             blob2.style.transform = `translate3d(0, ${scrollY * -0.2}px, 0)`;
         }
 
-        // DESKTOP ONLY: 3D Scroll Scrubbing
-        // Mobile uses IntersectionObserver below for better performance
         if (storySection && storyCard && !isMobile) {
             const rect = storySection.getBoundingClientRect();
-            const windowHeight = window.innerHeight;
             let fraction = (windowHeight - rect.top) / (windowHeight + rect.height);
             fraction = Math.max(0, Math.min(1, fraction));
 
@@ -787,9 +794,7 @@
             storyCard.style.transform = `rotateX(${rotation}deg) translate3d(0, ${translateY}px, 0)`;
             storyCard.style.opacity = Math.min(1, opacity + 0.2); 
             
-            // Text fade for Desktop
-            const lines = storyCard.querySelectorAll('.story-line');
-            lines.forEach((line, index) => {
+            storyLines.forEach((line, index) => {
                 const triggerPoint = 0.2 + (index * 0.05);
                 if (fraction > triggerPoint) {
                     line.style.opacity = 1;
@@ -906,27 +911,39 @@
         });
       }
 
-      // Heart Explosion (Optimized)
+      // Heart Explosion (WAAPI Optimized)
       document.getElementById("heart-btn").addEventListener("click", (e) => {
         const rect = e.target.getBoundingClientRect();
         const x = rect.left + rect.width/2;
         const y = rect.top + rect.height/2;
-        anime({ targets: '#heart-btn', scale: [1, 1.4, 1], duration: 300, easing: 'easeInOutQuad' });
         
-        // Limit particles on mobile
+        e.target.animate([
+            { transform: 'scale(1)' },
+            { transform: 'scale(1.4)' },
+            { transform: 'scale(1)' }
+        ], { duration: 300, easing: 'ease-in-out' });
+
         const count = isMobile ? 10 : 25; 
         for(let i=0; i<count; i++) {
             const p = document.createElement("div");
             p.className = "particle";
             p.style.left = x + "px"; p.style.top = y + "px";
             document.body.appendChild(p);
+            
             const angle = Math.random() * Math.PI * 2;
             const velocity = Math.random() * 100 + 50;
-            anime({
-                targets: p, translateX: Math.cos(angle) * velocity, translateY: Math.sin(angle) * velocity,
-                opacity: [1, 0], scale: [0, 1.5], duration: Math.random() * 800 + 600, easing: 'easeOutExpo',
-                complete: () => p.remove()
+            const tx = Math.cos(angle) * velocity;
+            const ty = Math.sin(angle) * velocity;
+
+            const animation = p.animate([
+                { transform: `translate(0,0) scale(0)`, opacity: 1 },
+                { transform: `translate(${tx}px, ${ty}px) scale(1.5)`, opacity: 0 }
+            ], {
+                duration: Math.random() * 600 + 400,
+                easing: 'cubic-bezier(0, .9, .57, 1)'
             });
+            
+            animation.onfinish = () => p.remove();
         }
       });
     </script>
