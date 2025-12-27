@@ -24,6 +24,7 @@
         --bg-color: #ffe6e9;
         --primary-color: #ff8fa3;
         --accent-color: #ff4d6d;
+        --accent-color-scrollpill:rgba(255, 143, 164, 0.46);
         --text-color: #594a4e;
         --card-bg: rgba(255, 255, 255, 0.75);
         --font-heading: "Dancing Script", cursive;
@@ -80,7 +81,7 @@
         * { cursor: none !important; }
         .cursor-dot, .cursor-outline {
           position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
-          border-radius: 50%; z-index: 100000000; pointer-events: none; will-change: transform;
+          border-radius: 50%; z-index: 1000000000; pointer-events: none; will-change: transform;
         }
         .cursor-dot { width: 8px; height: 8px; background-color: var(--accent-color); }
         .cursor-outline {
@@ -92,45 +93,99 @@
         .cursor-dot, .cursor-outline { display: none; }
       }
 
-      /* --- UI ELEMENTS --- */
-      .music-btn {
-        position: fixed; top: 20px; right: 20px; z-index: 1000;
-        background: var(--card-bg); border: 2px solid var(--primary-color);
-        border-radius: 50%; width: 50px; height: 50px;
-        display: flex; justify-content: center; align-items: center;
-        color: var(--accent-color); box-shadow: 0 8px 20px rgba(255, 143, 163, 0.3);
-        backdrop-filter: blur(10px); cursor: pointer;
-        transition: transform 0.3s;
-      }
-      .music-btn:active { transform: scale(0.9); }
-      .music-anim { animation: spin 4s linear infinite; }
-      @keyframes spin { 100% { transform: rotate(360deg); } }
-
       section {
         min-height: 100vh; display: flex; flex-direction: column;
         justify-content: center; align-items: center; padding: 2rem; position: relative;
       }
 
-      /* --- HERO SECTION --- */
+      /* --- HERO SECTION & ROLLING TEXT EFFECT --- */
       .ml11 {
-        font-family: var(--font-heading); font-size: clamp(2.5rem, 8vw, 5.5rem);
-        color: var(--accent-color); overflow: hidden; text-align: center;
+        font-family: var(--font-heading); 
+        font-size: clamp(3rem, 9vw, 5.5rem); 
+        color: var(--accent-color); 
+        text-align: center;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        line-height: 1.2;
       }
-      .typewriter-cursor {
-        display: inline-block; animation: blink 1s step-end infinite;
+
+      /* Wrapper to hide the text before it rolls up */
+      .ml11 .text-wrapper {
+        position: relative;
+        display: inline-block;
+        padding-top: 0.1em;
+        padding-right: 0.05em;
+        padding-bottom: 0.15em;
+        overflow: hidden; /* Quan trọng để che phần chữ chưa cuộn lên */
       }
-      .typewriter-cursor.hidden { display: none; }
-      @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+      .ml11 .letter {
+        display: inline-block;
+        line-height: 1em;
+        transform-origin: 0 100%; /* Tâm xoay ở dưới đáy để cuộn lên */
+      }
 
       .subtitle {
         font-size: clamp(1rem, 4vw, 1.5rem); margin-top: 20px; font-weight: 600;
         background: linear-gradient(45deg, #ff8fa3, #ff4d6d);
         -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         text-align: center; min-height: 1.5em;
+        opacity: 0; /* Hidden initially */
       }
 
-      /* --- STORY CARD (FIXED FLIP) --- */
+      /* --- NEW GLOWING HEART SVG --- */
+      .svg-container {
+        width: 180px; height: 180px; margin-bottom: 20px;
+        filter: drop-shadow(0 0 15px rgba(255, 77, 109, 0.6)); /* Outer Glow */
+      }
+      .heart-path {
+        stroke: var(--accent-color);
+        stroke-width: 4;
+        stroke-linecap: round;
+        opacity: 0.4;
+        stroke-linejoin: round;
+        fill-opacity: 0; 
+      }
+
+      /* --- NEW LIVELY SCROLL INDICATOR --- */
+      .scroll-wrapper {
+        margin-top: 50px;
+        display: flex; flex-direction: column; align-items: center;
+        cursor: pointer;
+      }
+      .scroll-pill {
+        width: 30px; height: 50px;
+
+        border: 2px solid var(--accent-color-scrollpill);
+        border-radius: 15px;
+        position: relative;
+        display: flex; justify-content: center;
+        box-shadow: 0 0 10px rgba(255, 77, 109, 0.3);
+      }
+      .scroll-dot {
+        width: 6px; height: 6px;
+        background: var(--accent-color);
+        border-radius: 50%;
+        margin-top: 8px;
+        animation: scroll-drop 1.5s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+      }
+      .scroll-arrow {
+        margin-top: 8px;
+        color: var(--accent-color);
+        font-size: 1.2rem;
+        animation: arrow-bounce 1.5s ease-in-out infinite;
+      }
+
+      @keyframes scroll-drop {
+        0% { transform: translateY(0); opacity: 1; }
+        80% { transform: translateY(20px); opacity: 0; }
+        100% { transform: translateY(0); opacity: 0; }
+      }
+      @keyframes arrow-bounce {
+        0%, 100% { transform: translateY(0); opacity: 0.6; }
+        50% { transform: translateY(5px); opacity: 1; }
+      }
+
+      /* --- STORY CARD --- */
       .story-section { perspective: 1500px; }
       .story-card {
         background: var(--card-bg);
@@ -139,18 +194,26 @@
         box-shadow: 0 30px 60px rgba(255, 143, 163, 0.2);
         max-width: 800px; width: 100%;
         border: 1px solid rgba(255, 255, 255, 0.5);
-        
-        /* 3D Config */
         transform-style: preserve-3d;
         transform-origin: center top; 
         will-change: transform, opacity;
-        
-        /* Trạng thái ban đầu */
         opacity: 0;
-        transform: rotateX(-90deg); /* Mặc định ẩn bằng cách xoay */
-        
-        /* QUAN TRỌNG: Không set transition cho transform để JS điều khiển mượt theo scroll */
-        transition: none !important; 
+        transform: translateY(50px);
+      }
+      
+      @media (max-width: 768px) {
+          .story-card {
+              transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 1s ease !important;
+              transform: rotateX(-90deg) translateY(50px);
+              opacity: 0;
+          }
+          .story-card.mobile-active {
+              transform: rotateX(0deg) translateY(0);
+              opacity: 1;
+          }
+      }
+      @media (min-width: 769px) {
+        .story-card { transform: rotateX(-90deg); }
       }
       
       .story-line {
@@ -159,9 +222,18 @@
         will-change: transform, opacity;
         transition: none !important;
       }
+      @media (max-width: 768px) {
+          .story-line { transition: opacity 0.5s ease, transform 0.5s ease !important; }
+          .story-card.mobile-active .story-line { opacity: 1; transform: translateY(0); }
+      }
 
       /* --- GALLERY --- */
       .memory-section { padding-top: 4rem; padding-bottom: 4rem; }
+      .gallery-title {
+        font-family: 'Dancing Script'; font-size: 3rem; color: #ff4d6d; margin-bottom: 2rem; opacity: 0; text-align: center;
+      }
+      .gallery-title .letter { display: inline-block; } 
+
       .gallery-grid {
         display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 2.5rem; width: 100%; max-width: 1200px;
@@ -195,17 +267,50 @@
       }
 
       /* --- COUNTER --- */
-      .counter-box {
-        background: var(--card-bg); backdrop-filter: blur(15px);
-        width: clamp(280px, 80vw, 380px); height: clamp(280px, 80vw, 380px);
-        border-radius: 50%; display: flex; flex-direction: column;
-        justify-content: center; align-items: center;
-        border: 2px dashed var(--primary-color);
-        box-shadow: 0 0 50px rgba(255, 143, 163, 0.2);
-        will-change: transform;
+      .counter-container {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        width: 100%; max-width: 800px;
       }
-      #days-count { font-size: clamp(4rem, 12vw, 7rem); font-weight: 700; color: var(--accent-color); display: inline-block;}
-      .number-wrapper { display: inline-block; }
+      .counter-title {
+        font-family: var(--font-heading); font-size: 2.5rem; color: var(--accent-color);
+        margin-bottom: 2rem; text-align: center; opacity: 0;
+      }
+      .timer-wrapper {
+        display: flex; align-items: center; justify-content: center;
+        gap: 1.5rem; flex-wrap: wrap;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        padding: 2rem; border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(255, 77, 109, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        will-change: transform; opacity: 0;
+      }
+      .time-box {
+        display: flex; flex-direction: column; align-items: center;
+        min-width: 80px; position: relative;
+      }
+      .time-value {
+        font-size: 3.5rem; font-weight: 700; color: var(--accent-color);
+        line-height: 1; margin-bottom: 5px;
+        text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.5);
+      }
+      .time-label {
+        font-size: 1rem; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
+      }
+      .timer-divider {
+        font-size: 2rem; color: var(--primary-color);
+        animation: heartBeat 1.2s infinite;
+        display: flex; align-items: center; justify-content: center;
+      }
+      @keyframes heartBeat {
+        0% { transform: scale(1); } 15% { transform: scale(1.3); } 30% { transform: scale(1); } 45% { transform: scale(1.15); } 60% { transform: scale(1); }
+      }
+      @media (max-width: 600px) {
+        .timer-wrapper { gap: 1rem; padding: 1.5rem; }
+        .time-value { font-size: 2.5rem; }
+        .time-box { min-width: 60px; }
+        .timer-divider { font-size: 1.5rem; }
+      }
 
       /* --- FINAL --- */
       .heart-btn {
@@ -213,37 +318,24 @@
         filter: drop-shadow(0 0 15px rgba(255, 77, 109, 0.4));
         animation: heartbeat 1.5s infinite; cursor: pointer; z-index: 100;
       }
-      @keyframes heartbeat {
-        0%, 100% { transform: scale(1); } 50% { transform: scale(1.2) rotate(5deg); }
-      }
 
-      /* --- POLAROID MODAL STYLES --- */
+      /* --- POLAROID MODAL --- */
       .modal {
         position: fixed; inset: 0; display: flex; justify-content: center;
         align-items: center; z-index: 100002; 
         pointer-events: none; opacity: 0;
       }
-      
       .modal-overlay {
         position: absolute; inset: 0; background: rgba(0, 0, 0, 0.85);
-        backdrop-filter: blur(5px);
-        opacity: 0;
+        backdrop-filter: blur(5px); opacity: 0;
       }
-
       .modal-content {
-        position: relative;
-        background: #fff;
-        padding: 15px;
-        border-radius: 4px;
-        width: 90%; max-width: 500px;
+        position: relative; background: #fff; padding: 15px;
+        border-radius: 4px; width: 90%; max-width: 500px;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        transform-origin: center center;
-        opacity: 0;
-        display: flex;
-        flex-direction: column;
-        max-height: 90vh;
+        transform-origin: center center; opacity: 0;
+        display: flex; flex-direction: column; max-height: 90vh;
       }
-      
       .modal-content::before {
         content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
         width: 100px; height: 35px;
@@ -251,65 +343,45 @@
         border-left: 1px dashed rgba(0,0,0,0.1);
         border-right: 1px dashed rgba(0,0,0,0.1);
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        backdrop-filter: blur(2px);
-        z-index: 2;
+        backdrop-filter: blur(2px); z-index: 2;
       }
-
       .modal-inner {
-        width: 100%; overflow: hidden;
-        border: 1px solid #eee;
-        flex-shrink: 0;
-        display: flex; justify-content: center; align-items: center;
+        width: 100%; overflow: hidden; border: 1px solid #eee;
+        flex-shrink: 0; display: flex; justify-content: center; align-items: center;
         background: #f8f8f8;
       }
-
       #modal-img {
         width: 100%; height: auto; max-height: 55vh; object-fit: contain; display: block;
       }
-      
       .modal-caption-container {
         position: relative; width: 100%; padding-top: 15px; padding-bottom: 10px; text-align: center;
         min-height: 60px;
       }
-
       #modal-caption {
-        font-family: 'Dancing Script', cursive; 
-        color: #444; 
-        font-size: clamp(1.5rem, 5vw, 2rem);
-        line-height: 1.3;
-        word-wrap: break-word;
-        display: inline; 
+        font-family: 'Dancing Script', cursive; color: #444; 
+        font-size: clamp(1.5rem, 5vw, 2rem); line-height: 1.3;
+        word-wrap: break-word; display: inline; 
       }
-
       .modal-cursor {
-        display: inline-block;
-        width: 2px; height: 1.2em;
-        background-color: var(--accent-color);
-        margin-left: 2px;
-        animation: blink 1s step-end infinite;
-        vertical-align: middle;
+        display: inline-block; width: 2px; height: 1.2em;
+        background-color: var(--accent-color); margin-left: 2px;
+        animation: blink 1s step-end infinite; vertical-align: middle;
       }
-      
       .close-modal {
         position: absolute; top: -15px; right: -15px; width: 40px; height: 40px;
         background: var(--accent-color); color: white; border-radius: 50%;
         display: flex; justify-content: center; align-items: center;
         cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        font-size: 1.2rem; z-index: 10;
-        border: 3px solid white;
+        font-size: 1.2rem; z-index: 10; border: 3px solid white;
         transition: transform 0.3s;
       }
       .close-modal:hover { transform: scale(1.1) rotate(90deg); }
 
-      /* --- SPARK EFFECT STYLE --- */
+      /* --- SPARK & PARTICLE --- */
       .spark {
-        position: fixed;
-        width: 4px; height: 4px;
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 999999;
+        position: fixed; width: 4px; height: 4px; border-radius: 50%;
+        pointer-events: none; z-index: 999999;
       }
-
       .particle {
         position: fixed; pointer-events: none;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff4d6d'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E");
@@ -328,13 +400,6 @@
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
 
-    <button class="music-btn" id="music-toggle" onclick="toggleMusic()">
-      <i class="fas fa-music"></i>
-    </button>
-    <audio id="bg-music" loop>
-      <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3" />
-    </audio>
-
     <div class="background-container" id="bg-container">
       <div class="blob" id="blob1" style="background: #ffc2d1; width: 40vw; height: 40vw; top: 5%; left: -10%;"></div>
       <div class="blob" id="blob2" style="background: #ffe5ec; width: 50vw; height: 50vw; top: 40%; right: -15%;"></div>
@@ -343,16 +408,36 @@
     </div>
 
     <section class="hero-section">
-      <h1 class="ml11" id="typewriter-title">
-        <span class="typewriter-text"></span>
-        <span class="typewriter-cursor">|</span>
+      <div class="svg-container">
+        <svg viewBox="0 0 100 100">
+            <defs>
+                <radialGradient id="heart-glow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                    <stop offset="0%" style="stop-color:#fff0f3; stop-opacity:0.9" />
+                    <stop offset="60%" style="stop-color:#ff4d6d; stop-opacity:0.5" />
+                    <stop offset="100%" style="stop-color:#ff4d6d; stop-opacity:0.1" />
+                </radialGradient>
+            </defs>
+            <path class="heart-path" fill="url(#heart-glow)" d="M50 88.9L48.5 87.6C20.4 62.1 2 45.5 2 25.1C2 8.5 14.9 2 29.8 2C38.2 2 46.3 5.9 50 12.1C53.7 5.9 61.8 2 70.2 2C85.1 2 98 8.5 98 25.1C98 45.5 79.6 62.1 51.5 87.6L50 88.9Z" />
+        </svg>
+      </div>
+
+      <h1 class="ml11">
+        <span class="text-wrapper">
+          <span class="letters" id="anime-title">Happy 2 Months Anniversary</span>
+        </span>
       </h1>
+      
       <p class="subtitle" id="typewriter-subtitle">
         <span class="subtitle-text"></span>
-        <span class="typewriter-cursor hidden">|</span>
       </p>
-      <div class="scroll-indicator" style="margin-top: 40px; animation: bounce 2s infinite">
-        <i class="fas fa-chevron-down" style="font-size: 2rem; color: var(--accent-color)"></i>
+      
+      <div class="scroll-wrapper">
+          <div class="scroll-pill">
+              <div class="scroll-dot"></div>
+          </div>
+          <div class="scroll-arrow">
+              <i class="fas fa-chevron-down"></i>
+          </div>
       </div>
     </section>
 
@@ -370,34 +455,39 @@
     </section>
 
     <section class="memory-section" id="gallery">
-      <h2
-        class="gallery-title"
-        style="text-align:center; font-family: 'Dancing Script'; font-size: 3rem; color: #ff4d6d; margin-bottom: 2rem; opacity: 0;"
-      >
-        Khoảnh khắc của chúng ta
-      </h2>
+      <h2 class="gallery-title">Khoảnh khắc của chúng ta</h2>
       <div class="gallery-grid" id="gallery-grid"></div>
     </section>
 
     <section class="counter-section" id="counter">
-      <div class="counter-box">
-        <h3 style="font-size: 1.1rem; color: #888; text-transform: uppercase; margin-top: 20px;">
-          Chúng ta đã bên nhau
-        </h3>
-        <div class="number-wrapper">
-          <span id="days-count">0</span>
+      <div class="counter-container">
+        <h3 class="counter-title">Chúng ta đã bên nhau</h3>
+        <div class="timer-wrapper">
+            <div class="time-box">
+                <span class="time-value" id="days-count">0</span>
+                <span class="time-label">Ngày</span>
+            </div>
+            <div class="timer-divider"><i class="fas fa-heart"></i></div>
+            <div class="time-box">
+                <span class="time-value" id="hours-count">00</span>
+                <span class="time-label">Giờ</span>
+            </div>
+            <div class="timer-divider">:</div>
+            <div class="time-box">
+                <span class="time-value" id="minutes-count">00</span>
+                <span class="time-label">Phút</span>
+            </div>
+            <div class="timer-divider">:</div>
+            <div class="time-box">
+                <span class="time-value" id="seconds-count">00</span>
+                <span class="time-label">Giây</span>
+            </div>
         </div>
-        <span class="label" style="font-size: 1.5rem; color: #ff4d6d; font-weight: 600; margin-bottom: 20px;"
-          >Ngày hạnh phúc</span
-        >
       </div>
     </section>
 
     <section id="final">
-      <p
-        class="final-text"
-        style="font-size: 1.8rem; margin-bottom: 20px; font-weight: 700; font-family: var(--font-heading); opacity: 0; text-align: center;"
-      >
+      <p class="final-text" style="font-size: 1.8rem; margin-bottom: 20px; font-weight: 700; font-family: var(--font-heading); opacity: 0; text-align: center;">
         Yêu em mãi mãi!
       </p>
       <button id="heart-btn" class="heart-btn" style="opacity: 0">
@@ -425,11 +515,11 @@
 
     <script>
       // CONFIGURATION & VARIABLES
-      const startDate = new Date(2025, 9, 26); 
+      const startDate = new Date(2025, 9, 26, 0, 0, 0); 
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
       let rafId = null;
 
-      // Memories Data (GIỮ NGUYÊN)
+      // Memories Data
       const memories = [
         { id: 1, img: "/textures/img7.jpg", caption: "Tấm hình kỷ niệm đầu tiên của hai mình.", date: "21/10/2025" },
         { id: 2, img: "/textures/img1.jpg", caption: "Những ngày khi chúng ta còn bỡ ngỡ khi bắt chuyện với nhau.", date: "22/10/2025" },
@@ -452,7 +542,87 @@
           `;
         }).join("");
 
-      // --- SPARK EFFECT FUNCTION ---
+      // --- HELPER: Wrap letters for Anime.js ---
+      function wrapText(element) {
+          element.innerHTML = element.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
+      }
+
+      // --- HERO ANIMATIONS ---
+      const heartPath = document.querySelector('.heart-path');
+      heartPath.style.fillOpacity = 0;
+
+      const heartAnim = anime.timeline({loop: true, direction: 'alternate'});
+      heartAnim
+        .add({
+          targets: '.heart-path',
+          strokeDashoffset: [anime.setDashoffset, 0],
+          easing: 'easeInOutSine',
+          duration: 2000,
+          delay: 500
+        })
+        .add({
+          targets: '.heart-path',
+          fillOpacity: [0, 1], 
+          duration: 1000,
+          easing: 'linear'
+        }, '-=1000');
+
+      // --- ROLLING TEXT EFFECT FOR HERO TITLE (UPDATED) ---
+      // Wrap letters first
+      var textWrapper = document.querySelector('.ml11 .letters');
+      textWrapper.innerHTML = textWrapper.textContent.replace(/([^\x00-\x80]|\w)/g, "<span class='letter'>$&</span>");
+
+      // Animate: TranslateY moves up, RotateX rolls from bottom (90deg) to front (0deg)
+      anime.timeline({loop: false})
+        .add({
+          targets: '.ml11 .letter',
+          translateY: ["100%",0],
+          translateZ: 0,
+          rotateX: [90, 0],
+          opacity: [0,1],
+          easing: "easeOutExpo",
+          duration: 1400,
+          delay: (el, i) => 300 + 40 * i // Staggering effect
+        });
+
+      // 3. Subtitle Fade
+      const loveMessages = [
+        "Cảm ơn vì đã đến bên anh ❤️",
+        "Mỗi ngày bên em đều là một món quà 💕",
+        "Anh yêu em nhiều hơn em biết 🌹",
+        "Em là điều tuyệt vời nhất ✨"
+      ];
+      let msgIndex = 0;
+      
+      function animateSubtitle() {
+          const subEl = document.querySelector(".subtitle");
+          const subTextEl = document.querySelector(".subtitle-text");
+          subTextEl.innerText = loveMessages[msgIndex];
+          
+          anime.timeline()
+            .add({
+                targets: subEl,
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 1000,
+                easing: "easeOutQuad"
+            })
+            .add({
+                targets: subEl,
+                opacity: 0,
+                translateY: -20,
+                duration: 800,
+                easing: "easeInQuad",
+                delay: 2000,
+                complete: () => {
+                    msgIndex = (msgIndex + 1) % loveMessages.length;
+                    animateSubtitle();
+                }
+            });
+      }
+      setTimeout(animateSubtitle, 2000); // Wait for title animation to finish
+
+      // --- SPARK EFFECT ---
       function createTyperSpark(element) {
         if (!element) return;
         const rect = element.getBoundingClientRect();
@@ -480,13 +650,12 @@
         }
       }
 
-      // --- MODAL WITH TYPEWRITER ---
+      // --- MODAL LOGIC ---
       const modalEl = document.getElementById('image-modal');
       const modalOverlay = document.querySelector('.modal-overlay');
       const modalContent = document.querySelector('.modal-content');
       const modalImg = document.getElementById('modal-img');
       const modalCaption = document.getElementById('modal-caption');
-      
       let typeInterval; 
 
       function openModal(imgSrc, captionText) {
@@ -516,17 +685,14 @@
 
         clearInterval(typeInterval);
         
-        // Bắt đầu gõ chữ
         setTimeout(() => {
             let i = 0;
             typeInterval = setInterval(() => {
                 if (i < captionText.length) {
                     modalCaption.textContent += captionText.charAt(i);
                     i++;
-                    
                     const cursor = document.querySelector('.modal-cursor');
                     createTyperSpark(cursor);
-
                 } else {
                     clearInterval(typeInterval);
                 }
@@ -544,44 +710,27 @@
                 setTimeout(() => { modalImg.src = ""; }, 100);
             }
         });
-
-        tl
-        .add({
-            targets: modalContent,
-            scale: 0.8,
-            opacity: 0,
-            translateY: 50 
-        })
-        .add({
-            targets: modalOverlay,
-            opacity: 0
-        }, '-=200');
+        tl.add({ targets: modalContent, scale: 0.8, opacity: 0, translateY: 50 })
+          .add({ targets: modalOverlay, opacity: 0 }, '-=200');
       }
 
-      // --- FLOATING HEARTS BACKGROUND ---
+      // --- FLOATING HEARTS ---
       function createFloatingHearts() {
         const container = document.getElementById('hearts-container');
         const heartCount = isMobile ? 15 : 30;
-
         for (let i = 0; i < heartCount; i++) {
             const heart = document.createElement('div');
             heart.classList.add('bg-heart', 'fas', 'fa-heart');
-            
             const size = Math.random() * 20 + 10;
             heart.style.fontSize = `${size}px`;
             heart.style.left = `${Math.random() * 100}vw`;
             heart.style.top = `${Math.random() * 100 + 100}vh`; 
-            
             container.appendChild(heart);
-
             anime({
                 targets: heart,
                 translateY: function() { return -1 * (Math.random() * 1000 + 800) },
                 translateX: function() { return anime.random(-50, 50); },
-                opacity: [
-                    { value: 0.6, duration: 100 },
-                    { value: 0, duration: 2000, delay: 3000 }
-                ],
+                opacity: [{ value: 0.6, duration: 100 }, { value: 0, duration: 2000, delay: 3000 }],
                 rotate: function() { return anime.random(-45, 45); },
                 duration: function() { return anime.random(5000, 10000); },
                 delay: function() { return anime.random(0, 5000); },
@@ -592,79 +741,7 @@
       }
       createFloatingHearts();
 
-      // --- TYPEWRITER (HERO SECTION) ---
-      function typeWriter(element, text, speed, callback, cursorElement) {
-        let i = 0;
-        element.textContent = "";
-        if (cursorElement) cursorElement.classList.remove("hidden");
-        function type() {
-          if (i < text.length) {
-            element.textContent += text.charAt(i);
-            i++;
-            createTyperSpark(cursorElement);
-            setTimeout(type, speed);
-          } else {
-            if (callback) callback();
-          }
-        }
-        type();
-      }
-
-      function eraseText(element, callback, cursorElement) {
-        const text = element.textContent;
-        let i = text.length;
-        function erase() {
-          if (i > 0) {
-            element.textContent = text.substring(0, i - 1);
-            i--;
-            setTimeout(erase, 30);
-          } else {
-            if (callback) callback();
-          }
-        }
-        erase();
-      }
-
-      const titleText = "Happy 2 Months Anniversary";
-      const titleElement = document.querySelector("#typewriter-title .typewriter-text");
-      const titleCursor = document.querySelector("#typewriter-title .typewriter-cursor");
-      
-      const loveMessages = [
-        "Cảm ơn vì đã đến bên anh ❤️",
-        "Mỗi ngày bên em đều là một món quà 💕",
-        "Anh yêu em nhiều hơn em biết 🌹",
-        "Em là điều tuyệt vời nhất ✨"
-      ];
-      let msgIndex = 0;
-
-      typeWriter(titleElement, titleText, 100, () => {
-        setTimeout(() => {
-            titleCursor.classList.add('hidden');
-            startSubtitleLoop();
-        }, 1000);
-      }, titleCursor);
-
-      function startSubtitleLoop() {
-        const subEl = document.querySelector("#typewriter-subtitle .subtitle-text");
-        const subCur = document.querySelector("#typewriter-subtitle .typewriter-cursor");
-        
-        function loop() {
-            if(msgIndex >= loveMessages.length) msgIndex = 0;
-            const msg = loveMessages[msgIndex];
-            subCur.classList.remove('hidden');
-            typeWriter(subEl, msg, 80, () => {
-                setTimeout(() => {
-                    eraseText(subEl, () => {
-                        msgIndex++;
-                        loop();
-                    }, subCur);
-                }, 2000);
-            }, subCur);
-        }
-        loop();
-      }
-
-      // --- SCROLL EFFECTS (FIXED MOBILE FLIP) ---
+      // --- SCROLL EFFECTS ---
       const blob1 = document.getElementById("blob1");
       const blob2 = document.getElementById("blob2");
       const storySection = document.getElementById("story");
@@ -675,7 +752,6 @@
       function handleScrollEffects() {
         const scrollY = window.scrollY;
         const windowHeight = window.innerHeight;
-        
         const docHeight = document.body.scrollHeight - windowHeight;
         if(docHeight > 0) {
             const progress = (scrollY / docHeight) * 100;
@@ -691,53 +767,93 @@
             let fraction = (windowHeight - rect.top) / (windowHeight + rect.height);
             fraction = Math.max(0, Math.min(1, fraction));
 
-            // Unified logic for PC & Mobile to ensure flip works
-            let rotation, opacity, translateY;
-            if (fraction <= 0.5) {
-                const progress = fraction * 2; 
-                rotation = -90 + (90 * progress);
-                opacity = progress;
-                translateY = 50 * (1 - progress);
-            } else {
-                const progress = (fraction - 0.5) * 2;
-                rotation = 0 + (90 * progress);
-                opacity = 1 - progress; 
-                translateY = -50 * progress;
-            }
-            // Use translate3d for GPU accel
-            storyCard.style.transform = `rotateX(${rotation}deg) translate3d(0, ${translateY}px, 0)`;
-            storyCard.style.opacity = Math.min(1, opacity + 0.2); 
-
-            storyLines.forEach((line, index) => {
-                const triggerPoint = 0.2 + (index * 0.05);
-                if (fraction > triggerPoint) {
-                    line.style.opacity = 1;
-                    line.style.transform = `translate3d(0, 0, 0)`;
-                    line.style.transition = "all 0.5s ease";
+            if (!isMobile) {
+                let rotation, opacity, translateY;
+                if (fraction <= 0.5) {
+                    const progress = fraction * 2; 
+                    rotation = -90 + (90 * progress);
+                    opacity = progress;
+                    translateY = 50 * (1 - progress);
                 } else {
-                    line.style.opacity = 0;
-                    line.style.transform = `translate3d(0, 20px, 0)`;
+                    const progress = (fraction - 0.5) * 2;
+                    rotation = 0 + (90 * progress);
+                    opacity = 1 - progress; 
+                    translateY = -50 * progress;
                 }
-            });
+                storyCard.style.transform = `rotateX(${rotation}deg) translate3d(0, ${translateY}px, 0)`;
+                storyCard.style.opacity = Math.min(1, opacity + 0.2); 
+                
+                storyLines.forEach((line, index) => {
+                    const triggerPoint = 0.2 + (index * 0.05);
+                    if (fraction > triggerPoint) {
+                        line.style.opacity = 1;
+                        line.style.transform = `translate3d(0, 0, 0)`;
+                        line.style.transition = "all 0.5s ease";
+                    } else {
+                        line.style.opacity = 0;
+                        line.style.transform = `translate3d(0, 20px, 0)`;
+                    }
+                });
+            }
         }
         rafId = null;
       }
 
+      // --- MOBILE STORY OBSERVER ---
+      if (isMobile) {
+          const storyObserver = new IntersectionObserver((entries) => {
+              entries.forEach(entry => {
+                  if (entry.isIntersecting) {
+                      const card = entry.target.querySelector('.story-card');
+                      card.classList.add('mobile-active');
+                      const lines = entry.target.querySelectorAll('.story-line');
+                      lines.forEach((line, index) => {
+                          setTimeout(() => {
+                              line.style.opacity = 1;
+                              line.style.transform = 'translateY(0)';
+                          }, index * 200 + 500); 
+                      });
+                  }
+              });
+          }, { threshold: 0.3 });
+          storyObserver.observe(document.getElementById('story'));
+      }
+
+      // --- COUNTER LOGIC ---
+      function updateCounter() {
+        const now = new Date();
+        const diff = now - startDate;
+        if (diff >= 0) {
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            document.getElementById('days-count').innerText = days;
+            document.getElementById('hours-count').innerText = hours < 10 ? '0' + hours : hours;
+            document.getElementById('minutes-count').innerText = minutes < 10 ? '0' + minutes : minutes;
+            document.getElementById('seconds-count').innerText = seconds < 10 ? '0' + seconds : seconds;
+        }
+      }
+
+      // --- MAIN OBSERVER (Gallery, Counter, Final) ---
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if(entry.isIntersecting) {
+                // GALLERY
                 if(entry.target.id === "gallery") {
-                    anime({
-                        targets: '.gallery-title', opacity: [0,1], translateY: [-20,0], duration: 800, easing: 'easeOutQuad'
+                    const title = entry.target.querySelector('.gallery-title');
+                    wrapText(title);
+                    anime.timeline().add({
+                        targets: '.gallery-title .letter',
+                        translateY: [50,0], opacity: [0,1],
+                        easing: "easeOutExpo", duration: 1000,
+                        delay: (el, i) => 30 * i
                     });
                     
                     anime({
-                        targets: '.memory-card', 
-                        opacity: [0,1], 
-                        translateY: [50,0], 
-                        rotate: function() { return anime.random(-3, 3); }, 
-                        delay: anime.stagger(150), 
-                        easing: 'easeOutQuad',
+                        targets: '.memory-card', opacity: [0,1], translateY: [50,0], 
+                        rotate: () => anime.random(-3, 3), 
+                        delay: anime.stagger(150), easing: 'easeOutQuad',
                         complete: function(anim) {
                             document.querySelectorAll('.memory-card').forEach(card => {
                                 const currentRotation = card.style.transform.match(/rotate\(([^)]+)\)/);
@@ -751,38 +867,22 @@
                     observer.unobserve(entry.target);
                 }
                 
-                // --- COUNTER ANIMATION ---
+                // COUNTER
                 if(entry.target.id === "counter") {
-                    const today = new Date();
-                    const diff = Math.ceil(Math.abs(today - startDate) / (1000 * 60 * 60 * 24));
-                    
-                    anime({
-                        targets: '#days-count', 
-                        innerHTML: [0, diff], 
-                        round: 1, 
-                        duration: 2500, 
-                        easing: 'easeOutExpo'
-                    });
+                    const title = entry.target.querySelector('.counter-title');
+                    anime({ targets: title, opacity: [0,1], translateY: [20,0], duration: 1000 });
 
+                    updateCounter();
+                    setInterval(updateCounter, 1000);
+                    anime({ targets: '.timer-wrapper', opacity: [0,1], scale: [0.8, 1], easing: 'spring(1, 80, 10, 0)' });
                     anime({
-                        targets: '.number-wrapper', 
-                        scale: [0.5, 1],
-                        easing: 'spring(1, 80, 10, 0)'
+                        targets: '.timer-wrapper', translateY: [-5, 5],
+                        direction: 'alternate', loop: true, duration: 3000, easing: 'easeInOutSine', delay: 1000
                     });
-
-                    anime({
-                        targets: '.number-wrapper',
-                        translateY: [-5, 5],
-                        direction: 'alternate',
-                        loop: true,
-                        duration: 2000,
-                        easing: 'easeInOutSine',
-                        delay: 2000
-                    });
-
                     observer.unobserve(entry.target);
                 }
 
+                // FINAL
                 if(entry.target.id === "final") {
                     anime({ targets: '.final-text', opacity: [0,1], translateY: [20,0], duration: 800 });
                     anime({ targets: '#heart-btn', opacity: [0,1], scale: [0,1], delay: 300, duration: 1000 });
@@ -796,11 +896,8 @@
       document.querySelectorAll('#gallery, #counter, #final').forEach(sec => observer.observe(sec));
 
       window.addEventListener('scroll', () => {
-        if (!rafId) {
-            rafId = requestAnimationFrame(handleScrollEffects);
-        }
+        if (!rafId) { rafId = requestAnimationFrame(handleScrollEffects); }
       }, { passive: true });
-      
       handleScrollEffects();
 
       if (!isMobile) {
@@ -808,52 +905,26 @@
         const outline = document.querySelector(".cursor-outline");
         window.addEventListener("mousemove", (e) => {
             dot.style.left = e.clientX + "px"; dot.style.top = e.clientY + "px";
-            outline.animate({
-                left: `${e.clientX}px`,
-                top: `${e.clientY}px`
-            }, { duration: 500, fill: "forwards" });
+            outline.animate({ left: `${e.clientX}px`, top: `${e.clientY}px` }, { duration: 500, fill: "forwards" });
         });
-      }
-
-      let isPlaying = false;
-      function toggleMusic() {
-        const audio = document.getElementById("bg-music");
-        const btn = document.getElementById("music-toggle");
-        if(isPlaying) { 
-            audio.pause(); 
-            btn.classList.remove("music-anim"); 
-        } else { 
-            audio.play().catch(e => console.log("Audio play failed interaction needed")); 
-            btn.classList.add("music-anim"); 
-        }
-        isPlaying = !isPlaying;
       }
 
       document.getElementById("heart-btn").addEventListener("click", (e) => {
         const rect = e.target.getBoundingClientRect();
         const x = rect.left + rect.width/2;
         const y = rect.top + rect.height/2;
-        
         anime({ targets: '#heart-btn', scale: [1, 1.4, 1], duration: 300, easing: 'easeInOutQuad' });
-
         const count = isMobile ? 15 : 30; 
         for(let i=0; i<count; i++) {
             const p = document.createElement("div");
             p.className = "particle";
             p.style.left = x + "px"; p.style.top = y + "px";
             document.body.appendChild(p);
-            
             const angle = Math.random() * Math.PI * 2;
             const velocity = Math.random() * 100 + 50;
-            
             anime({
-                targets: p,
-                translateX: Math.cos(angle) * velocity,
-                translateY: Math.sin(angle) * velocity,
-                opacity: [1, 0],
-                scale: [0, 1.5],
-                duration: Math.random() * 800 + 600,
-                easing: 'easeOutExpo',
+                targets: p, translateX: Math.cos(angle) * velocity, translateY: Math.sin(angle) * velocity,
+                opacity: [1, 0], scale: [0, 1.5], duration: Math.random() * 800 + 600, easing: 'easeOutExpo',
                 complete: () => p.remove()
             });
         }
