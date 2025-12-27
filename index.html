@@ -61,6 +61,7 @@
         background: linear-gradient(to right, var(--primary-color), var(--accent-color));
         width: 0%; z-index: 100001;
         box-shadow: 0 0 15px rgba(255, 77, 109, 0.5);
+        will-change: width;
       }
 
       /* --- BACKGROUND ELEMENTS --- */
@@ -74,6 +75,7 @@
       
       .bg-heart {
         position: absolute; color: var(--primary-color); opacity: 0; z-index: -1; filter: blur(1px);
+        will-change: transform, opacity;
       }
 
       /* --- CURSOR (PC Only) --- */
@@ -98,7 +100,7 @@
         justify-content: center; align-items: center; padding: 2rem; position: relative;
       }
 
-      /* --- HERO SECTION & ROLLING TEXT EFFECT --- */
+      /* --- HERO SECTION --- */
       .ml11 {
         font-family: var(--font-heading); 
         font-size: clamp(3rem, 9vw, 5.5rem); 
@@ -108,73 +110,49 @@
         line-height: 1.2;
       }
 
-      /* Wrapper to hide the text before it rolls up */
       .ml11 .text-wrapper {
-        position: relative;
-        display: inline-block;
-        padding-top: 0.1em;
-        padding-right: 0.05em;
-        padding-bottom: 0.15em;
-        overflow: hidden; /* Quan trọng để che phần chữ chưa cuộn lên */
+        position: relative; display: inline-block; padding-top: 0.1em; padding-right: 0.05em; padding-bottom: 0.15em;
+        overflow: hidden; 
       }
-
       .ml11 .letter {
-        display: inline-block;
-        line-height: 1em;
-        transform-origin: 0 100%; /* Tâm xoay ở dưới đáy để cuộn lên */
+        display: inline-block; line-height: 1em; transform-origin: 0 100%;
       }
 
       .subtitle {
         font-size: clamp(1rem, 4vw, 1.5rem); margin-top: 20px; font-weight: 600;
         background: linear-gradient(45deg, #ff8fa3, #ff4d6d);
         -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        text-align: center; min-height: 1.5em;
-        opacity: 0; /* Hidden initially */
+        text-align: center; min-height: 1.5em; opacity: 0;
       }
 
-      /* --- NEW GLOWING HEART SVG --- */
+      /* --- SVG GLOW --- */
       .svg-container {
         width: 180px; height: 180px; margin-bottom: 20px;
-        filter: drop-shadow(0 0 15px rgba(255, 77, 109, 0.6)); /* Outer Glow */
+        filter: drop-shadow(0 0 15px rgba(255, 77, 109, 0.6)); 
+        will-change: filter;
       }
       .heart-path {
-        stroke: var(--accent-color);
-        stroke-width: 4;
-        stroke-linecap: round;
-        opacity: 0.4;
-        stroke-linejoin: round;
-        fill-opacity: 0; 
+        stroke: var(--accent-color); stroke-width: 4; stroke-linecap: round;
+        opacity: 0.4; stroke-linejoin: round; fill-opacity: 0; 
       }
 
-      /* --- NEW LIVELY SCROLL INDICATOR --- */
+      /* --- SCROLL INDICATOR --- */
       .scroll-wrapper {
-        margin-top: 50px;
-        display: flex; flex-direction: column; align-items: center;
-        cursor: pointer;
+        margin-top: 50px; display: flex; flex-direction: column; align-items: center; cursor: pointer;
       }
       .scroll-pill {
-        width: 30px; height: 50px;
-
-        border: 2px solid var(--accent-color-scrollpill);
-        border-radius: 15px;
-        position: relative;
-        display: flex; justify-content: center;
+        width: 30px; height: 50px; border: 2px solid var(--accent-color-scrollpill);
+        border-radius: 15px; position: relative; display: flex; justify-content: center;
         box-shadow: 0 0 10px rgba(255, 77, 109, 0.3);
       }
       .scroll-dot {
-        width: 6px; height: 6px;
-        background: var(--accent-color);
-        border-radius: 50%;
-        margin-top: 8px;
-        animation: scroll-drop 1.5s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+        width: 6px; height: 6px; background: var(--accent-color); border-radius: 50%;
+        margin-top: 8px; animation: scroll-drop 1.5s cubic-bezier(0.77, 0, 0.175, 1) infinite;
       }
       .scroll-arrow {
-        margin-top: 8px;
-        color: var(--accent-color);
-        font-size: 1.2rem;
+        margin-top: 8px; color: var(--accent-color); font-size: 1.2rem;
         animation: arrow-bounce 1.5s ease-in-out infinite;
       }
-
       @keyframes scroll-drop {
         0% { transform: translateY(0); opacity: 1; }
         80% { transform: translateY(20px); opacity: 0; }
@@ -191,6 +169,7 @@
         background: var(--card-bg);
         padding: clamp(2rem, 5vw, 4rem); border-radius: 40px;
         backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px); /* Safari support */
         box-shadow: 0 30px 60px rgba(255, 143, 163, 0.2);
         max-width: 800px; width: 100%;
         border: 1px solid rgba(255, 255, 255, 0.5);
@@ -203,7 +182,7 @@
       
       @media (max-width: 768px) {
           .story-card {
-              transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 1s ease !important;
+              transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.8s ease !important;
               transform: rotateX(-90deg) translateY(50px);
               opacity: 0;
           }
@@ -211,6 +190,8 @@
               transform: rotateX(0deg) translateY(0);
               opacity: 1;
           }
+          /* Disable heavy blur on mobile for performance */
+          .story-card { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
       }
       @media (min-width: 769px) {
         .story-card { transform: rotateX(-90deg); }
@@ -283,7 +264,7 @@
         padding: 2rem; border-radius: 20px;
         box-shadow: 0 10px 30px rgba(255, 77, 109, 0.15);
         border: 1px solid rgba(255, 255, 255, 0.8);
-        will-change: transform; opacity: 0;
+        will-change: transform, opacity; opacity: 0;
       }
       .time-box {
         display: flex; flex-direction: column; align-items: center;
@@ -319,15 +300,23 @@
         animation: heartbeat 1.5s infinite; cursor: pointer; z-index: 100;
       }
 
-      /* --- POLAROID MODAL --- */
+      /* --- POLAROID MODAL (Fixed Visibility) --- */
       .modal {
         position: fixed; inset: 0; display: flex; justify-content: center;
         align-items: center; z-index: 100002; 
         pointer-events: none; opacity: 0;
+        visibility: hidden; /* Fix: Hide completely when closed */
+        transition: visibility 0s 0.4s, opacity 0.4s ease; /* Delay visibility change */
       }
+      .modal.active {
+        opacity: 1; pointer-events: auto; visibility: visible;
+        transition: opacity 0.4s ease;
+      }
+      
       .modal-overlay {
         position: absolute; inset: 0; background: rgba(0, 0, 0, 0.85);
-        backdrop-filter: blur(5px); opacity: 0;
+        backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+        opacity: 0;
       }
       .modal-content {
         position: relative; background: #fff; padding: 15px;
@@ -385,7 +374,7 @@
       .particle {
         position: fixed; pointer-events: none;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff4d6d'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E");
-        background-size: contain; width: 25px; height: 25px; z-index: 10000;
+        background-size: contain; width: 25px; height: 25px; z-index: 10000; will-change: transform;
       }
 
       @media (max-width: 768px) {
@@ -542,7 +531,7 @@
           `;
         }).join("");
 
-      // --- HELPER: Wrap letters for Anime.js ---
+      // --- HELPER: Wrap letters ---
       function wrapText(element) {
           element.innerHTML = element.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
       }
@@ -567,12 +556,10 @@
           easing: 'linear'
         }, '-=1000');
 
-      // --- ROLLING TEXT EFFECT FOR HERO TITLE (UPDATED) ---
-      // Wrap letters first
+      // --- ROLLING TEXT EFFECT ---
       var textWrapper = document.querySelector('.ml11 .letters');
       textWrapper.innerHTML = textWrapper.textContent.replace(/([^\x00-\x80]|\w)/g, "<span class='letter'>$&</span>");
 
-      // Animate: TranslateY moves up, RotateX rolls from bottom (90deg) to front (0deg)
       anime.timeline({loop: false})
         .add({
           targets: '.ml11 .letter',
@@ -582,7 +569,7 @@
           opacity: [0,1],
           easing: "easeOutExpo",
           duration: 1400,
-          delay: (el, i) => 300 + 40 * i // Staggering effect
+          delay: (el, i) => 300 + 40 * i 
         });
 
       // 3. Subtitle Fade
@@ -620,7 +607,7 @@
                 }
             });
       }
-      setTimeout(animateSubtitle, 2000); // Wait for title animation to finish
+      setTimeout(animateSubtitle, 2000); 
 
       // --- SPARK EFFECT ---
       function createTyperSpark(element) {
@@ -650,24 +637,32 @@
         }
       }
 
-      // --- MODAL LOGIC ---
+      // --- MODAL LOGIC (FIXED) ---
       const modalEl = document.getElementById('image-modal');
       const modalOverlay = document.querySelector('.modal-overlay');
       const modalContent = document.querySelector('.modal-content');
       const modalImg = document.getElementById('modal-img');
       const modalCaption = document.getElementById('modal-caption');
+      
       let typeInterval; 
+      let isModalAnimating = false; // Prevent double clicks
 
       function openModal(imgSrc, captionText) {
+        if (isModalAnimating) return;
+        isModalAnimating = true;
+
         modalImg.src = imgSrc;
         modalCaption.innerText = ""; 
         
-        modalEl.style.opacity = 1;
-        modalEl.style.pointerEvents = 'auto';
+        modalEl.classList.add('active'); // Use class for visibility
         
         const randomRotate = anime.random(-4, 4);
 
-        anime.timeline({ easing: 'easeOutExpo', duration: 800 })
+        anime.timeline({ 
+            easing: 'easeOutExpo', 
+            duration: 800,
+            complete: () => { isModalAnimating = false; }
+        })
         .add({
             targets: modalOverlay,
             opacity: [0, 1],
@@ -685,6 +680,7 @@
 
         clearInterval(typeInterval);
         
+        // Start typing
         setTimeout(() => {
             let i = 0;
             typeInterval = setInterval(() => {
@@ -701,13 +697,18 @@
       }
 
       function closeModal() {
+        if (isModalAnimating) return; // Wait for open anim to finish if clicked too fast
+        // Force stop typing
         clearInterval(typeInterval);
+        isModalAnimating = true;
+
         const tl = anime.timeline({
             easing: 'easeInBack',
             duration: 400,
             complete: () => {
-                modalEl.style.pointerEvents = 'none';
-                setTimeout(() => { modalImg.src = ""; }, 100);
+                modalEl.classList.remove('active'); // Hide via class
+                modalImg.src = ""; 
+                isModalAnimating = false;
             }
         });
         tl.add({ targets: modalContent, scale: 0.8, opacity: 0, translateY: 50 })
@@ -717,7 +718,7 @@
       // --- FLOATING HEARTS ---
       function createFloatingHearts() {
         const container = document.getElementById('hearts-container');
-        const heartCount = isMobile ? 15 : 30;
+        const heartCount = isMobile ? 12 : 30; // Reduce count for mobile performance
         for (let i = 0; i < heartCount; i++) {
             const heart = document.createElement('div');
             heart.classList.add('bg-heart', 'fas', 'fa-heart');
@@ -741,60 +742,63 @@
       }
       createFloatingHearts();
 
-      // --- SCROLL EFFECTS ---
+      // --- SCROLL EFFECTS (PERFORMANCE OPTIMIZED) ---
       const blob1 = document.getElementById("blob1");
       const blob2 = document.getElementById("blob2");
       const storySection = document.getElementById("story");
       const storyCard = document.querySelector(".story-card");
-      const storyLines = document.querySelectorAll(".story-line");
       const progressBar = document.getElementById("scroll-progress");
 
       function handleScrollEffects() {
         const scrollY = window.scrollY;
-        const windowHeight = window.innerHeight;
-        const docHeight = document.body.scrollHeight - windowHeight;
+        
+        // Progress Bar
+        const docHeight = document.body.scrollHeight - window.innerHeight;
         if(docHeight > 0) {
-            const progress = (scrollY / docHeight) * 100;
-            progressBar.style.width = `${progress}%`;
+            progressBar.style.width = `${(scrollY / docHeight) * 100}%`;
         }
         
-        const factor = isMobile ? 0.05 : 0.2;
-        blob1.style.transform = `translate3d(0, ${scrollY * factor}px, 0)`;
-        blob2.style.transform = `translate3d(0, ${scrollY * -factor}px, 0)`;
+        // Parallax only if not mobile to save CPU
+        if (!isMobile) {
+            blob1.style.transform = `translate3d(0, ${scrollY * 0.2}px, 0)`;
+            blob2.style.transform = `translate3d(0, ${scrollY * -0.2}px, 0)`;
+        }
 
-        if (storySection && storyCard) {
+        // DESKTOP ONLY: 3D Scroll Scrubbing
+        // Mobile uses IntersectionObserver below for better performance
+        if (storySection && storyCard && !isMobile) {
             const rect = storySection.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
             let fraction = (windowHeight - rect.top) / (windowHeight + rect.height);
             fraction = Math.max(0, Math.min(1, fraction));
 
-            if (!isMobile) {
-                let rotation, opacity, translateY;
-                if (fraction <= 0.5) {
-                    const progress = fraction * 2; 
-                    rotation = -90 + (90 * progress);
-                    opacity = progress;
-                    translateY = 50 * (1 - progress);
-                } else {
-                    const progress = (fraction - 0.5) * 2;
-                    rotation = 0 + (90 * progress);
-                    opacity = 1 - progress; 
-                    translateY = -50 * progress;
-                }
-                storyCard.style.transform = `rotateX(${rotation}deg) translate3d(0, ${translateY}px, 0)`;
-                storyCard.style.opacity = Math.min(1, opacity + 0.2); 
-                
-                storyLines.forEach((line, index) => {
-                    const triggerPoint = 0.2 + (index * 0.05);
-                    if (fraction > triggerPoint) {
-                        line.style.opacity = 1;
-                        line.style.transform = `translate3d(0, 0, 0)`;
-                        line.style.transition = "all 0.5s ease";
-                    } else {
-                        line.style.opacity = 0;
-                        line.style.transform = `translate3d(0, 20px, 0)`;
-                    }
-                });
+            let rotation, opacity, translateY;
+            if (fraction <= 0.5) {
+                const progress = fraction * 2; 
+                rotation = -90 + (90 * progress);
+                opacity = progress;
+                translateY = 50 * (1 - progress);
+            } else {
+                const progress = (fraction - 0.5) * 2;
+                rotation = 0 + (90 * progress);
+                opacity = 1 - progress; 
+                translateY = -50 * progress;
             }
+            storyCard.style.transform = `rotateX(${rotation}deg) translate3d(0, ${translateY}px, 0)`;
+            storyCard.style.opacity = Math.min(1, opacity + 0.2); 
+            
+            // Text fade for Desktop
+            const lines = storyCard.querySelectorAll('.story-line');
+            lines.forEach((line, index) => {
+                const triggerPoint = 0.2 + (index * 0.05);
+                if (fraction > triggerPoint) {
+                    line.style.opacity = 1;
+                    line.style.transform = `translate3d(0, 0, 0)`;
+                } else {
+                    line.style.opacity = 0;
+                    line.style.transform = `translate3d(0, 20px, 0)`;
+                }
+            });
         }
         rafId = null;
       }
@@ -806,13 +810,6 @@
                   if (entry.isIntersecting) {
                       const card = entry.target.querySelector('.story-card');
                       card.classList.add('mobile-active');
-                      const lines = entry.target.querySelectorAll('.story-line');
-                      lines.forEach((line, index) => {
-                          setTimeout(() => {
-                              line.style.opacity = 1;
-                              line.style.transform = 'translateY(0)';
-                          }, index * 200 + 500); 
-                      });
                   }
               });
           }, { threshold: 0.3 });
@@ -909,12 +906,15 @@
         });
       }
 
+      // Heart Explosion (Optimized)
       document.getElementById("heart-btn").addEventListener("click", (e) => {
         const rect = e.target.getBoundingClientRect();
         const x = rect.left + rect.width/2;
         const y = rect.top + rect.height/2;
         anime({ targets: '#heart-btn', scale: [1, 1.4, 1], duration: 300, easing: 'easeInOutQuad' });
-        const count = isMobile ? 15 : 30; 
+        
+        // Limit particles on mobile
+        const count = isMobile ? 10 : 25; 
         for(let i=0; i<count; i++) {
             const p = document.createElement("div");
             p.className = "particle";
