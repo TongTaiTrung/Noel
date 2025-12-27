@@ -1,380 +1,968 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>2 Tháng của chúng ta</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2 Months of Us</title>
 
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
 
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&family=Dancing+Script:wght@500&display=swap");
-
       :root {
-        --sat: env(safe-area-inset-top);
-        --sab: env(safe-area-inset-bottom);
+        --bg-color: #ffe6e9;
+        --primary-color: #ff8fa3;
+        --accent-color: #ff4d6d;
+        --text-color: #594a4e;
+        --card-bg: rgba(255, 255, 255, 0.7);
+        --font-heading: "Dancing Script", cursive;
+        --font-body: "Quicksand", sans-serif;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        cursor: none !important;
+        user-select: none;
       }
 
       body {
-        margin: 0; background-color: #050505; color: white;
-        font-family: "Montserrat", sans-serif; overflow-x: hidden;
-        -webkit-tap-highlight-color: transparent;
+        /* 1. BACKGROUND GRADIENT ANIMATION */
+        background: linear-gradient(-45deg, #fff0f3, #ffe6e9, #fff0f5, #ffd1dc);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+
+        font-family: var(--font-body);
+        color: var(--text-color);
+        overflow-x: hidden;
+        position: relative;
       }
 
-      /* Cursor Logic */
-      @media (pointer: fine) {
-        body { cursor: none !important; }
-        a, button, [role="button"], .group { cursor: none !important; }
-      }
-      @media (pointer: coarse) {
-        body { cursor: auto !important; }
-        .desktop-only { display: none !important; }
+      @keyframes gradientBG {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
       }
 
-      .cinzel { font-family: "Cinzel", serif; }
-      .handwriting { font-family: "Dancing Script", cursive; }
-
-      /* Background Canvas */
-      #canvas-bg, #canvas-dust { 
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-        pointer-events: none; will-change: transform;
+      /* --- SCROLL PROGRESS BAR --- */
+      .scroll-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 4px;
+        background: var(--accent-color);
+        width: 0%;
+        z-index: 99999;
+        box-shadow: 0 0 10px var(--accent-color);
       }
-      #canvas-bg { z-index: -2; background: radial-gradient(circle at center, #1e0d36 0%, #000000 100%); }
-      #canvas-dust { z-index: 1000; }
 
-      /* Masonry Layout */
-      .masonry-container {
-        columns: 1; gap: 2rem; padding: 15px; perspective: 1000px;
+      /* --- BACKGROUND BLOBS (Parallax Targets) --- */
+      .background-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -2;
+        overflow: hidden;
+        perspective: 1000px;
       }
-      @media (min-width: 768px) { .masonry-container { columns: 2; } }
-      @media (min-width: 1024px) { .masonry-container { columns: 3; } }
+      .blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(40px);
+        opacity: 0.6;
+        will-change: transform; /* Tối ưu hiệu năng */
+      }
 
-      .masonry-item {
-        break-inside: avoid; margin-bottom: 3rem; display: block;
+      /* --- HEART DUST --- */
+      .heart-dust {
+        position: fixed;
+        color: #fff;
+        z-index: -1;
+        pointer-events: none;
+        opacity: 0;
+        text-shadow: 0 0 5px rgba(255, 77, 109, 0.8);
+        font-size: 10px;
+        will-change: transform, opacity;
+      }
+
+      /* --- CUSTOM CURSOR --- */
+      .cursor-dot,
+      .cursor-outline {
+        position: fixed;
+        top: 0;
+        left: 0;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        z-index: 100000;
+        pointer-events: none;
+      }
+      .cursor-dot {
+        width: 8px;
+        height: 8px;
+        background-color: var(--accent-color);
+      }
+      .cursor-outline {
+        width: 40px;
+        height: 40px;
+        border: 2px solid var(--primary-color);
+        transition: width 0.2s, height 0.2s;
+      }
+
+      /* --- MUSIC BUTTON --- */
+      .music-btn {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 100;
+        background: rgba(255, 255, 255, 0.8);
+        border: 2px solid var(--primary-color);
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        color: var(--accent-color);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+      }
+      .music-btn:hover {
+        transform: scale(1.1);
+      }
+      .music-anim {
+        animation: spin 3s linear infinite;
+      }
+      @keyframes spin {
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      section {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+        position: relative;
+      }
+
+      /* --- HERO SECTION --- */
+      .hero-section {
+        text-align: center;
+        z-index: 2;
+      }
+
+      h1.ml11 {
+        font-family: var(--font-heading);
+        font-size: 5rem;
+        color: var(--accent-color);
+        line-height: 1.2;
+        text-shadow: 2px 2px 10px rgba(255, 77, 109, 0.2);
+      }
+
+      .subtitle {
+        font-size: 1.5rem;
+        margin-top: 20px;
+        font-weight: 600;
+        opacity: 0;
+        background: linear-gradient(to right, #ff8fa3, #ff4d6d);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .scroll-indicator {
+        position: absolute;
+        bottom: 40px;
+        color: var(--accent-color);
+        animation: bounce 2s infinite;
+        font-size: 2rem;
+      }
+
+      /* --- STORY SECTION (Updated for 3D Effect) --- */
+      .story-section {
+        perspective: 1500px; /* Tạo chiều sâu 3D */
+      }
+
+      .story-card {
+        background: var(--card-bg);
+        padding: 4rem;
+        border-radius: 30px;
+        backdrop-filter: blur(15px);
+        box-shadow: 0 20px 50px rgba(255, 143, 163, 0.3);
+        max-width: 700px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+
+        /* Initial State cho Anime.js */
+        opacity: 0;
         transform-style: preserve-3d;
+        transform: rotateX(20deg) translateY(100px);
       }
 
-      .glass-panel {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        transform-style: preserve-3d;
+      .story-card h2 {
+        font-family: var(--font-heading);
+        font-size: 3rem;
+        color: var(--accent-color);
+        margin-bottom: 1.5rem;
       }
 
-      .shine-effect {
-        position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-        background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
-        transform: skewX(-25deg); pointer-events: none; z-index: 20;
-      }
-      @media (hover: hover) {
-        .group:hover .shine-effect { animation: shine 0.7s forwards; }
-      }
-      @keyframes shine { from { left: -100%; } to { left: 150%; } }
-
-      .cursor-blink::after {
-        content: "|"; animation: blink 1s step-start infinite;
-        margin-left: 2px; color: #f472b6;
-      }
-      @keyframes blink { 50% { opacity: 0; } }
-      
-      .modal-blur {
-        background: rgba(0, 0, 0, 0.9);
-        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      /* Tách từng dòng text để animate */
+      .story-line {
+        display: block;
+        opacity: 0;
+        transform: translateY(20px);
+        font-size: 1.2rem;
+        line-height: 1.8;
+        margin-bottom: 5px;
       }
 
-      ::-webkit-scrollbar { width: 0; }
+      /* --- MEMORY GALLERY --- */
+      .memory-section {
+        perspective: 1000px;
+      }
+      .gallery-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2rem;
+        max-width: 1200px;
+      }
+      .memory-card {
+        width: 280px;
+        height: 380px;
+        background: #fff;
+        padding: 15px 15px 50px 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease, z-index 0.3s;
+        position: relative;
+        transform-origin: center;
+        opacity: 0;
+        border-radius: 2px;
+        cursor: pointer;
+      }
+      .memory-card:nth-child(odd) {
+        transform: rotate(-3deg);
+      }
+      .memory-card:nth-child(even) {
+        transform: rotate(3deg);
+      }
+      .memory-card:hover {
+        transform: scale(1.1) rotate(0deg) !important;
+        z-index: 10;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      }
+      .card-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border: 1px solid #eee;
+        pointer-events: none;
+      }
+      .caption-text {
+        position: absolute;
+        bottom: 15px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        font-family: "Dancing Script", cursive;
+        font-size: 1.8rem;
+        color: #555;
+      }
+
+      /* --- MODAL --- */
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .modal-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 240, 243, 0.85);
+        backdrop-filter: blur(8px);
+      }
+      .modal-content {
+        position: relative;
+        background: #fff;
+        padding: 15px;
+        border-radius: 15px;
+        max-width: 90%;
+        max-height: 90%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        transform: scale(0.8);
+        border: 10px solid #fff;
+        outline: 2px dashed var(--primary-color);
+      }
+      .modal-img {
+        max-width: 100%;
+        max-height: 55vh;
+        border-radius: 5px;
+        object-fit: contain;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      .modal-decoration {
+        font-size: 1.5rem;
+        color: var(--accent-color);
+        margin: 10px 0 5px 0;
+      }
+      .modal-caption {
+        font-family: "Dancing Script", cursive;
+        font-size: 2rem;
+        color: var(--text-color);
+        text-align: center;
+        line-height: 1.3;
+        max-width: 80%;
+      }
+      .close-modal {
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        width: 40px;
+        height: 40px;
+        background: var(--accent-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: transform 0.2s;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        z-index: 10001;
+      }
+      .close-modal:hover {
+        transform: scale(1.1) rotate(90deg);
+      }
+
+      /* --- COUNTER --- */
+      .counter-box {
+        background: rgba(255, 255, 255, 0.5);
+        padding: 3rem;
+        border-radius: 50%;
+        width: 350px;
+        height: 350px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 0 40px rgba(255, 77, 109, 0.2);
+        border: 2px dashed var(--primary-color);
+        position: relative;
+      }
+      .counter-box::before {
+        content: "";
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        border-top-color: var(--accent-color);
+        border-bottom-color: var(--accent-color);
+        animation: spin 10s linear infinite;
+      }
+      .number-wrapper {
+        font-size: 6rem;
+        font-weight: 700;
+        color: var(--accent-color);
+        line-height: 1;
+      }
+
+      /* --- FINAL --- */
+      .heart-btn {
+        font-size: 5rem;
+        background: none;
+        border: none;
+        transition: transform 0.2s;
+        animation: heartbeat 1.5s infinite;
+      }
+      @keyframes heartbeat {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+      }
+      @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+        40% {transform: translateY(-10px);}
+        60% {transform: translateY(-5px);}
+      }
+      .particle {
+        position: fixed;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff4d6d'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E");
+        background-size: cover;
+        width: 30px;
+        height: 30px;
+        z-index: 9999;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        * {
+          cursor: auto !important;
+        }
+        .cursor-dot,
+        .cursor-outline {
+          display: none;
+        }
+        h1.ml11 {
+          font-size: 3rem;
+        }
+        .story-card {
+          padding: 2rem;
+          width: 90%;
+        }
+        .counter-box {
+          width: 280px;
+          height: 280px;
+        }
+        .number-wrapper {
+          font-size: 4rem;
+        }
+        .gallery-grid {
+          gap: 1rem;
+        }
+        .memory-card {
+          width: 100%;
+          max-width: 300px;
+          transform: rotate(0deg) !important;
+        }
+        .modal-content {
+          width: 90%;
+          padding: 10px;
+          border: 5px solid #fff;
+        }
+        .modal-caption {
+          font-size: 1.5rem;
+        }
+      }
     </style>
   </head>
   <body>
-    <canvas id="canvas-bg"></canvas>
-    <canvas id="canvas-dust"></canvas>
-    <div id="root"></div>
+    <div class="scroll-progress" id="scroll-progress"></div>
 
-    <script type="text/babel">
-      const { useState, useEffect, useRef, useMemo } = React;
-      const { motion, AnimatePresence, useMotionValue, useSpring, useTransform } = window.Motion;
+    <div class="modal" id="image-modal">
+      <div class="modal-overlay" onclick="closeModal()"></div>
+      <div class="modal-content">
+        <div class="close-modal" onclick="closeModal()">
+          <i class="fas fa-times"></i>
+        </div>
+        <img src="" alt="Full Image" class="modal-img" id="modal-img" />
+        <div class="modal-decoration">
+          <i class="fas fa-heart" style="color: #ff4d6d"></i>
+        </div>
+        <p class="modal-caption" id="modal-caption"></p>
+      </div>
+    </div>
 
+    <audio id="bg-music" loop>
+      <source
+        src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+        type="audio/mp3"
+      />
+    </audio>
+
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <div class="background-container">
+      <div
+        class="blob"
+        id="blob1"
+        style="
+          background: #ffc2d1;
+          width: 400px;
+          height: 400px;
+          top: 10%;
+          left: 10%;
+        "
+      ></div>
+      <div
+        class="blob"
+        id="blob2"
+        style="
+          background: #ffe5ec;
+          width: 500px;
+          height: 500px;
+          top: 50%;
+          right: 10%;
+        "
+      ></div>
+      <div
+        class="blob"
+        id="blob3"
+        style="
+          background: #ffccd5;
+          width: 300px;
+          height: 300px;
+          bottom: 10%;
+          left: 30%;
+        "
+      ></div>
+    </div>
+
+    <section class="hero-section">
+      <h1 class="ml11">
+        <span class="text-wrapper">
+          <span class="line line1"></span>
+          <span class="letters">Happy 2 Months Anniversary</span>
+        </span>
+      </h1>
+      <p class="subtitle">
+        Cảm ơn vì đã đến bên anh
+        <i class="fas fa-heart" style="color: #ff4d6d"></i>
+      </p>
+      <div class="scroll-indicator">
+        <i class="fas fa-chevron-down"></i>
+      </div>
+    </section>
+
+    <section class="story-section" id="story">
+      <div class="story-card">
+        <h2>Câu chuyện nhỏ</h2>
+        <div class="story-content">
+          <span class="story-line">Hai tháng trôi qua thật nhanh,</span>
+          <span class="story-line"
+            >nhưng cũng đủ để chúng ta có những kỷ niệm thật đẹp.</span
+          >
+          <span class="story-line">Từ những dòng tin nhắn đầu tiên,</span>
+          <span class="story-line"
+            >những buổi hẹn hò ngại ngùng cho đến lúc này.</span
+          >
+          <span class="story-line"
+            >Mỗi ngày trôi qua, anh lại thấy yêu em nhiều hơn một chút.</span
+          >
+        </div>
+      </div>
+    </section>
+
+    <section class="memory-section" id="gallery">
+      <h2
+        style="
+          font-family: 'Dancing Script';
+          font-size: 3rem;
+          color: #ff4d6d;
+          margin-bottom: 2rem;
+        "
+      >
+        Khoảnh khắc của chúng ta
+      </h2>
+      <div class="gallery-grid" id="gallery-grid"></div>
+    </section>
+
+    <section class="counter-section" id="counter">
+      <div class="counter-box">
+        <h3 style="font-size: 1.2rem; color: #888">Chúng ta đã bên nhau</h3>
+        <div class="number-wrapper">
+          <span id="days-count">0</span>
+        </div>
+        <span class="label" style="font-size: 1.5rem; color: #ff4d6d"
+          >Ngày</span
+        >
+        <p class="love-note" style="margin-top: 15px">Và sẽ còn mãi...</p>
+      </div>
+    </section>
+
+    <section class="final-section" id="final">
+      <div class="heart-container" style="text-align: center">
+        <p style="font-size: 1.5rem; margin-bottom: 20px">Yêu cậu rất nhiều</p>
+        <button id="heart-btn" class="heart-btn">
+          <i class="fas fa-heart" style="color: #ff4d6d"></i>
+        </button>
+        <p
+          class="click-hint"
+          style="margin-top: 10px; font-size: 0.9rem; color: #999"
+        >
+          (Nhấn vào trái tim nhé)
+        </p>
+      </div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <script>
+      const startDate = new Date(2025, 9, 26);
       const memories = [
-        { id: 1, src: "/textures/img7.jpg", note: "Tấm hình kỷ niệm đầu tiên của hai mình.", date: "21/10/2025" },
-        { id: 2, src: "/textures/img1.jpg", note: "Những ngày khi chúng ta còn bỡ ngỡ khi bắt chuyện với nhau.", date: "22/10/2025" },
-        { id: 3, src: "/textures/img6.jpg", note: "Lúc ra về nhưng lại không muốn rời xa em.", date: "25/10/2025" },
-        { id: 4, src: "/textures/img4.jpg", note: "Buổi đi chơi giống như hẹn hò vậy, anh cứ nhớ mãi.", date: "14/11/2025" },
-        { id: 5, src: "/textures/img8.jpg", note: "Món quà em tặng anh nhân ngày International Men's Day.", date: "19/11/2025" },
-        { id: 6, src: "/textures/img9.png", note: "Em lại đến bên anh với một bất ngờ. Có lẽ trước đó anh đã không nói, nhưng món quà của em khiến anh xúc động rất nhiều!", date: "19/11/2025" },
-        { id: 7, src: "/textures/img2.jpg", note: "Mỗi giây phút bên em, đối với anh đó đều là những món quà.", date: "20/11/2025" },
+        {
+          img: "/textures/img7.jpg",
+          date: "21/10/2025",
+          caption: "Tấm hình kỷ niệm đầu tiên của hai mình.",
+        },
+        {
+          img: "/textures/img1.jpg",
+          date: "22/10/2025",
+          caption:
+            "Những ngày khi chúng ta còn bỡ ngỡ khi bắt chuyện với nhau.",
+        },
+        {
+          img: "/textures/img6.jpg",
+          date: "25/10/2025",
+          caption: "Lúc ra về nhưng lại không muốn rời xa em.",
+        },
+        {
+          img: "/textures/img4.jpg",
+          date: "14/11/2025",
+          caption: "Buổi đi chơi giống như hẹn hò vậy, anh cứ nhớ mãi.",
+        },
+        {
+          img: "/textures/img8.jpg",
+          date: "19/11/2025",
+          caption: "Món quà em tặng anh nhân ngày International Men's Day.",
+        },
+        {
+          img: "/textures/img9.png",
+          date: "19/11/2025",
+          caption:
+            "Em lại đến bên anh với một bất ngờ. Có lẽ trước đó anh đã không nói, nhưng món quà của em khiến anh xúc động rất nhiều!",
+        },
+        {
+          img: "/textures/img2.jpg",
+          date: "20/11/2025",
+          caption: "Mỗi giây phút bên em, đối với anh đó đều là những món quà.",
+        },
       ];
 
-      // --- Custom Cursor ---
-      const GlowCursor = () => {
-        const mouseX = useMotionValue(-100); const mouseY = useMotionValue(-100);
-        const springConfig = { damping: 25, stiffness: 300 };
-        const x = useSpring(mouseX, springConfig); const y = useSpring(mouseY, springConfig);
-        useEffect(() => {
-          const move = (e) => { mouseX.set(e.clientX); mouseY.set(e.clientY); };
-          window.addEventListener("mousemove", move); return () => window.removeEventListener("mousemove", move);
-        }, []);
-        return (
-          <div className="desktop-only pointer-events-none fixed inset-0 z-[9999]">
-            <motion.div style={{ x, y, translateX: "-50%", translateY: "-50%" }} className="w-2 h-2 bg-white rounded-full mix-blend-difference" />
-            <motion.div style={{ x, y, translateX: "-50%", translateY: "-50%" }} className="w-12 h-12 bg-pink-500/30 rounded-full blur-xl" />
-          </div>
+      const galleryGrid = document.getElementById("gallery-grid");
+
+      galleryGrid.innerHTML = memories
+        .map(
+          (memory) => `
+            <div class="memory-card" data-caption="${memory.caption}" onclick="openModal(this)">
+                  <img src="${memory.img}" class="card-image" alt="Memory">
+                  <div class="caption-text">${memory.date}</div>
+            </div>
+         `
+        )
+        .join("");
+
+      // --- 1. HEART DUST EFFECT ---
+      function createHeartDust() {
+        const container = document.querySelector(".background-container");
+        const dustCount = 40;
+        for (let i = 0; i < dustCount; i++) {
+          const heart = document.createElement("div");
+          heart.classList.add("heart-dust");
+          heart.innerHTML = '<i class="fas fa-heart"></i>';
+          container.appendChild(heart);
+
+          const colors = ["#ff8fa3", "#ff4d6d", "#fff", "#ffd1dc"];
+          heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+          heart.style.left = Math.random() * 100 + "vw";
+          heart.style.top = Math.random() * 100 + "vh";
+
+          anime({
+            targets: heart,
+            translateY: [
+              { value: -1000, duration: anime.random(15000, 25000) },
+            ],
+            translateX: [
+              { value: 50, duration: 3000, easing: "easeInOutSine" },
+              { value: -50, duration: 3000, easing: "easeInOutSine" },
+            ],
+            opacity: [
+              { value: 0.8, duration: 1000 },
+              { value: 0, duration: 1000, delay: anime.random(5000, 10000) },
+            ],
+            scale: [0.5, 1.5],
+            loop: true,
+            direction: "alternate",
+            easing: "linear",
+            delay: anime.random(0, 5000),
+          });
+        }
+      }
+      createHeartDust();
+
+      // --- 2. PARALLAX & SCROLL PROGRESS (NEW) ---
+      window.addEventListener("scroll", () => {
+        const scrollY = window.scrollY;
+        const docHeight = document.body.scrollHeight - window.innerHeight;
+
+        // Progress Bar
+        const progress = (scrollY / docHeight) * 100;
+        document.getElementById("scroll-progress").style.width = `${progress}%`;
+
+        // Parallax Blobs (Hiệu ứng cuộn lệch)
+        // Di chuyển blob với tốc độ khác nhau dựa trên scrollY
+        const blob1 = document.getElementById("blob1");
+        const blob2 = document.getElementById("blob2");
+        const blob3 = document.getElementById("blob3");
+
+        if (blob1) blob1.style.transform = `translateY(${scrollY * 0.2}px)`;
+        if (blob2) blob2.style.transform = `translateY(${scrollY * -0.3}px)`;
+        if (blob3) blob3.style.transform = `translateY(${scrollY * 0.1}px)`;
+      });
+
+      // --- 3. MODAL LOGIC ---
+      const modal = document.getElementById("image-modal");
+      const modalImg = document.getElementById("modal-img");
+      const modalCaption = document.getElementById("modal-caption");
+
+      function openModal(element) {
+        const imgSrc = element.querySelector("img").src;
+        const captionText = element.getAttribute("data-caption");
+        modalImg.src = imgSrc;
+        modalCaption.textContent = captionText;
+        modal.style.pointerEvents = "auto";
+        anime({
+          targets: modal,
+          opacity: [0, 1],
+          duration: 300,
+          easing: "linear",
+        });
+        anime({
+          targets: ".modal-content",
+          scale: [0.5, 1],
+          duration: 500,
+          easing: "easeOutElastic(1, .8)",
+        });
+      }
+
+      function closeModal() {
+        modal.style.pointerEvents = "none";
+        anime({
+          targets: modal,
+          opacity: [1, 0],
+          duration: 300,
+          easing: "linear",
+        });
+        anime({
+          targets: ".modal-content",
+          scale: [1, 0.5],
+          duration: 300,
+          easing: "easeInQuad",
+        });
+      }
+
+      // --- 4. CUSTOM CURSOR ---
+      const cursorDot = document.querySelector(".cursor-dot");
+      const cursorOutline = document.querySelector(".cursor-outline");
+      window.addEventListener("mousemove", (e) => {
+        const posX = e.clientX;
+        const posY = e.clientY;
+        cursorDot.style.left = `${posX}px`;
+        cursorDot.style.top = `${posY}px`;
+        cursorOutline.animate(
+          { left: `${posX}px`, top: `${posY}px` },
+          { duration: 500, fill: "forwards" }
         );
-      };
+      });
+      const hoverables = document.querySelectorAll(
+        "button, .memory-card, .music-btn, .close-modal"
+      );
+      hoverables.forEach((el) => {
+        el.addEventListener("mouseenter", () => {
+          cursorOutline.style.transform = "translate(-50%, -50%) scale(1.5)";
+          cursorOutline.style.backgroundColor = "rgba(255, 77, 109, 0.1)";
+        });
+        el.addEventListener("mouseleave", () => {
+          cursorOutline.style.transform = "translate(-50%, -50%) scale(1)";
+          cursorOutline.style.backgroundColor = "transparent";
+        });
+      });
 
-      // --- Rotating Text ---
-      const RotatingText = () => {
-        const quotes = useMemo(() => ["Cảm ơn em vì đã đến bên anh...", "Mỗi khoảnh khắc là một điều kỳ diệu...", "Yêu em nhiều hơn mỗi ngày...", "Our journey has just begun..."], []);
-        const [text, setText] = useState(""); const [isDeleting, setIsDeleting] = useState(false);
-        const [loopNum, setLoopNum] = useState(0); const [delta, setDelta] = useState(100);
-        useEffect(() => {
-          let ticker = setInterval(() => tick(), delta);
-          return () => clearInterval(ticker);
-        }, [text, delta]);
-        const tick = () => {
-          let i = loopNum % quotes.length; let full = quotes[i];
-          let updated = isDeleting ? full.substring(0, text.length - 1) : full.substring(0, text.length + 1);
-          setText(updated);
-          if (isDeleting) setDelta(40);
-          if (!isDeleting && updated === full) { setIsDeleting(true); setDelta(2000); }
-          else if (isDeleting && updated === "") { setIsDeleting(false); setLoopNum(loopNum + 1); setDelta(100); }
-        };
-        return <span className="cursor-blink">{text}</span>;
-      };
+      // --- 5. ANIMATIONS & SCROLL OBSERVER ---
+      // Hero Text
+      var textWrapper = document.querySelector(".ml11 .letters");
+      textWrapper.innerHTML = textWrapper.textContent.replace(
+        /([^\x00-\x80]|\w)/g,
+        "<span class='letter'>$&</span>"
+      );
+      anime
+        .timeline({ loop: false })
+        .add({
+          targets: ".ml11 .line",
+          scaleY: [0, 1],
+          opacity: [0.5, 1],
+          easing: "easeOutExpo",
+          duration: 700,
+        })
+        .add({
+          targets: ".ml11 .line",
+          translateX: [
+            0,
+            document.querySelector(".ml11 .letters").getBoundingClientRect()
+              .width + 10,
+          ],
+          easing: "easeOutExpo",
+          duration: 700,
+          delay: 100,
+        })
+        .add({
+          targets: ".ml11 .letter",
+          opacity: [0, 1],
+          translateY: [-30, 0],
+          scale: [0.5, 1],
+          easing: "easeOutElastic(1, .6)",
+          duration: 800,
+          offset: "-=775",
+          delay: (el, i) => 34 * (i + 1),
+        })
+        .add({
+          targets: ".subtitle",
+          opacity: [0, 1],
+          translateY: [20, 0],
+          easing: "easeOutExpo",
+          duration: 1000,
+        });
 
-      // --- Background ---
-      const UniverseBackground = () => {
-        useEffect(() => {
-          const cBg = document.getElementById("canvas-bg"), cDust = document.getElementById("canvas-dust");
-          const ctxBg = cBg.getContext("2d"), ctxDust = cDust.getContext("2d");
-          let w, h, stars = [], particles = [];
-          const resize = () => {
-            w = window.innerWidth; h = window.innerHeight;
-            cBg.width = w; cBg.height = h; cDust.width = w; cDust.height = h;
-            stars = Array.from({ length: w < 768 ? 60 : 150 }, () => ({ x: Math.random() * w, y: Math.random() * h, size: Math.random() * 1.5, opacity: Math.random(), fadeDir: 0.005 }));
-            particles = Array.from({ length: w < 768 ? 30 : 80 }, () => ({ x: (Math.random() - 0.5) * w, y: (Math.random() - 0.5) * h, z: Math.random() * w }));
-          };
-          window.addEventListener("resize", resize); resize();
-          const animate = () => {
-            ctxBg.clearRect(0, 0, w, h);
-            stars.forEach(s => {
-              ctxBg.fillStyle = `rgba(255, 255, 255, ${s.opacity})`; ctxBg.beginPath(); ctxBg.arc(s.x, s.y, s.size, 0, Math.PI * 2); ctxBg.fill();
-              s.opacity += s.fadeDir; if (s.opacity > 1 || s.opacity < 0.2) s.fadeDir = -s.fadeDir;
-            });
-            ctxDust.clearRect(0, 0, w, h);
-            const cx = w / 2, cy = h / 2;
-            particles.forEach(p => {
-              p.z -= 2; if (p.z <= 0) p.z = w;
-              const scale = 300 / p.z, px = cx + p.x * scale, py = cy + p.y * scale, r = (1 - p.z / w) * 3;
-              if (px >= 0 && px <= w && py >= 0 && py <= h) {
-                ctxDust.fillStyle = `rgba(244, 114, 182, ${1 - p.z / w})`; ctxDust.beginPath(); ctxDust.arc(px, py, r, 0, Math.PI * 2); ctxDust.fill();
+      // Scroll Interactions
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              // --- STORY CARD: FLIP & STAGGER EFFECT (NEW) ---
+              if (entry.target.id === "story") {
+                // 1. Animate thẻ bài lật lên
+                anime({
+                  targets: ".story-card",
+                  opacity: [0, 1],
+                  rotateX: [20, 0], // Lật từ nghiêng sang thẳng
+                  translateY: [100, 0],
+                  duration: 1500,
+                  easing: "easeOutElastic(1, .6)",
+                });
+
+                // 2. Animate từng dòng chữ bên trong
+                anime({
+                  targets: ".story-line",
+                  opacity: [0, 1],
+                  translateY: [20, 0],
+                  delay: anime.stagger(300, { start: 500 }), // Dòng sau hiện chậm hơn dòng trước
+                  duration: 1000,
+                  easing: "easeOutExpo",
+                });
+
+                observer.unobserve(entry.target);
               }
-            });
-            requestAnimationFrame(animate);
-          };
-          animate();
-        }, []);
-        return null;
-      };
 
-      // --- ALIVE CARD WITH SMOOTH SPRING PHYSICS ---
-      const AliveCard = ({ item, onSelect }) => {
-        // Raw mouse position values (normalized -0.5 to 0.5)
-        const x = useMotionValue(0);
-        const y = useMotionValue(0);
+              if (entry.target.id === "gallery") {
+                anime({
+                  targets: ".memory-card",
+                  translateY: [100, 0],
+                  opacity: [0, 1],
+                  rotate: function (el, i) {
+                    return i % 2 === 0 ? -3 : 3;
+                  },
+                  delay: anime.stagger(200),
+                  duration: 1200,
+                  easing: "easeOutExpo",
+                });
+                observer.unobserve(entry.target);
+              }
+              if (entry.target.id === "counter") {
+                const today = new Date();
+                const diffTime = Math.abs(today - startDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                anime({
+                  targets: "#days-count",
+                  innerHTML: [0, diffDays],
+                  round: 1,
+                  easing: "easeOutExpo",
+                  duration: 2500,
+                });
+                observer.unobserve(entry.target);
+              }
+            }
+          });
+        },
+        { threshold: 0.3 }
+      );
+      document
+        .querySelectorAll("section")
+        .forEach((sec) => observer.observe(sec));
 
-        // --- SPRING PHYSICS MAGIC ---
-        // stiffness: Độ cứng (càng cao càng phản hồi nhanh)
-        // damping: Độ hãm (càng cao càng ít dao động)
-        const springConfig = { damping: 20, stiffness: 150 }; 
-        const springX = useSpring(x, springConfig);
-        const springY = useSpring(y, springConfig);
+      // --- 6. HEART EXPLOSION & MUSIC ---
+      const heartBtn = document.getElementById("heart-btn");
+      heartBtn.addEventListener("click", (e) => {
+        const rect = heartBtn.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+        anime({
+          targets: "#heart-btn",
+          scale: [1, 2, 1],
+          duration: 500,
+          easing: "easeOutElastic(1, .5)",
+        });
+        for (let i = 0; i < 50; i++) {
+          const particle = document.createElement("div");
+          particle.classList.add("particle");
+          document.body.appendChild(particle);
+          const angle = Math.random() * Math.PI * 2;
+          const velocity = Math.random() * 200 + 100;
+          particle.style.left = x + "px";
+          particle.style.top = y + "px";
+          anime({
+            targets: particle,
+            translateX: Math.cos(angle) * velocity,
+            translateY: Math.sin(angle) * velocity,
+            opacity: [1, 0],
+            scale: [0, 2],
+            rotate: anime.random(0, 360),
+            duration: anime.random(1000, 2000),
+            easing: "easeOutExpo",
+            complete: () => particle.remove(),
+          });
+        }
+      });
 
-        // Map spring values to rotation degrees
-        const rotateX = useTransform(springY, [-0.5, 0.5], [15, -15]); 
-        const rotateY = useTransform(springX, [-0.5, 0.5], [-15, 15]);
-
-        const randomDuration = useMemo(() => 3 + Math.random() * 2, []);
-        const randomDelay = useMemo(() => Math.random() * 2, []);
-
-        const handleMouseMove = (e) => {
-          const rect = e.currentTarget.getBoundingClientRect();
-          const width = rect.width;
-          const height = rect.height;
-          // Calculate relative position from center (-0.5 to 0.5)
-          const mouseX = e.clientX - rect.left;
-          const mouseY = e.clientY - rect.top;
-          const xPct = mouseX / width - 0.5;
-          const yPct = mouseY / height - 0.5;
-          
-          x.set(xPct);
-          y.set(yPct);
-        };
-
-        const handleMouseLeave = () => {
-          x.set(0);
-          y.set(0);
-        };
-
-        return (
-          <div className="masonry-item" style={{ perspective: 1000 }}>
-            {/* 1. Floating Animation (Ambient) */}
-            <motion.div
-              animate={{ y: [0, -15, 0] }}
-              transition={{ duration: randomDuration, repeat: Infinity, ease: "easeInOut", delay: randomDelay }}
-            >
-              {/* 2. Interactive Tilt (Spring Physics) */}
-              <motion.div
-                layoutId={`card-${item.id}`}
-                style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
-                onClick={() => onSelect(item)}
-                className="relative rounded-2xl overflow-hidden glass-panel cursor-pointer group shadow-2xl"
-              >
-                <div className="shine-effect" />
-                
-                {/* Border Glow */}
-                <div className="absolute inset-0 rounded-2xl ring-1 ring-white/10 group-hover:ring-pink-400/50 transition-all duration-500 z-10" />
-                
-                <motion.img 
-                  layoutId={`img-${item.id}`}
-                  src={item.src} 
-                  className="w-full h-auto object-cover block opacity-90 group-hover:opacity-100 transition-all duration-500 transform group-hover:scale-105" 
-                  alt="Memory"
-                />
-                
-                <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/90 to-transparent pt-12 translate-y-2 group-hover:translate-y-0 transition-transform duration-500 z-20">
-                  <motion.p layoutId={`date-${item.id}`} className="cinzel text-[10px] text-pink-400 font-bold tracking-widest uppercase mb-1">
-                    {item.date}
-                  </motion.p>
-                  <p className="text-xs text-white/80 line-clamp-1 italic font-light">{item.note}</p>
-                </div>
-              </motion.div>
-            </motion.div>
-          </div>
-        );
-      };
-
-      // --- MODAL ---
-      const Modal = ({ selected, onClose }) => {
-        return (
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[2000] flex items-center justify-center p-4 modal-blur"
-            onClick={onClose}
-          >
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-pink-600/20 rounded-full blur-[100px] pointer-events-none" />
-
-            <motion.div 
-              layoutId={`card-${selected.id}`}
-              className="relative w-full max-w-5xl bg-[#111] rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-2xl border border-white/10 max-h-[85vh] z-10"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="md:w-3/5 bg-black/40 relative flex items-center justify-center overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/30 pointer-events-none" />
-                <motion.div
-                  animate={{ y: [0, -10, 0], scale: [1, 1.02, 1] }}
-                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                  className="w-full h-full flex items-center justify-center p-4"
-                >
-                  <motion.img 
-                    layoutId={`img-${selected.id}`}
-                    src={selected.src} 
-                    className="w-full h-full object-contain max-h-[50vh] md:max-h-full drop-shadow-2xl"
-                  />
-                </motion.div>
-              </div>
-
-              <div className="md:w-2/5 p-8 flex flex-col bg-zinc-900/90 backdrop-blur-md relative border-l border-white/5">
-                <button 
-                  onClick={onClose}
-                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/50 hover:bg-white/20 hover:text-white transition-colors"
-                >
-                  ✕
-                </button>
-
-                <div className="mt-2 mb-6">
-                  <motion.span layoutId={`date-${selected.id}`} className="cinzel text-pink-500 text-xs font-bold tracking-[0.2em] uppercase">
-                    {selected.date}
-                  </motion.span>
-                </div>
-
-                <div className="overflow-y-auto pr-2 custom-scroll flex-1">
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }} 
-                    animate={{ opacity: 1, y: 0 }} 
-                    transition={{ delay: 0.3, duration: 0.8 }}
-                    className="handwriting text-2xl md:text-3xl text-gray-100 leading-relaxed"
-                  >
-                    "{selected.note}"
-                  </motion.div>
-                </div>
-
-                <motion.div 
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
-                  className="mt-6 pt-6 border-t border-white/5 flex items-center gap-2"
-                >
-                  <div className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
-                  <span className="text-[10px] text-white/30 uppercase tracking-widest">Memory Logged</span>
-                </motion.div>
-              </div>
-
-            </motion.div>
-          </motion.div>
-        );
-      };
-
-      const App = () => {
-        const [selected, setSelected] = useState(null);
-        return (
-          <>
-            <GlowCursor />
-            <UniverseBackground />
-            
-            <main className="relative z-10 w-full min-h-screen pb-10">
-              <section className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
-                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.5, ease: "easeOut" }}>
-                  <h1 className="cinzel text-5xl md:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-white via-pink-200 to-pink-500 mb-6 drop-shadow-[0_0_15px_rgba(236,72,153,0.3)]">
-                    Eternal Love
-                  </h1>
-                  <div className="h-8 flex items-center justify-center">
-                    <p className="text-pink-300/80 text-sm md:text-lg tracking-[0.3em] font-light uppercase">
-                      <RotatingText />
-                    </p>
-                  </div>
-                </motion.div>
-                
-                <motion.div 
-                  animate={{ y: [0, 10, 0], opacity: [0.3, 1, 0.3] }} 
-                  transition={{ duration: 2, repeat: Infinity }} 
-                  className="absolute bottom-10"
-                >
-                  <span className="text-[10px] text-white/30 uppercase tracking-widest">Scroll Down</span>
-                </motion.div>
-              </section>
-
-              <section className="max-w-7xl mx-auto px-4 md:px-8">
-                <div className="masonry-container">
-                  {memories.map((item, index) => (
-                    <AliveCard key={item.id} item={item} index={index} onSelect={setSelected} />
-                  ))}
-                </div>
-              </section>
-            </main>
-
-            <AnimatePresence>
-              {selected && <Modal selected={selected} onClose={() => setSelected(null)} />}
-            </AnimatePresence>
-          </>
-        );
-      };
-
-      const root = ReactDOM.createRoot(document.getElementById("root"));
-      root.render(<App />);
+      const music = document.getElementById("bg-music");
+      const musicBtn = document.getElementById("music-toggle");
+      let isPlaying = false;
+      function toggleMusic() {
+        if (isPlaying) {
+          music.pause();
+          musicBtn.classList.remove("music-anim");
+          musicBtn.innerHTML = '<i class="fas fa-music"></i>';
+          musicBtn.style.opacity = "0.7";
+        } else {
+          music.play();
+          musicBtn.classList.add("music-anim");
+          musicBtn.innerHTML = '<i class="fas fa-compact-disc"></i>';
+          musicBtn.style.opacity = "1";
+        }
+        isPlaying = !isPlaying;
+      }
     </script>
   </body>
 </html>

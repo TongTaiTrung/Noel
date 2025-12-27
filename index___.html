@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>2 Tháng của chúng ta</title>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&family=Dancing+Script:wght@500&display=swap");
+
+      :root {
+        --sat: env(safe-area-inset-top);
+        --sab: env(safe-area-inset-bottom);
+      }
+
+      body {
+        margin: 0; background-color: #050505; color: white;
+        font-family: "Montserrat", sans-serif; overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* Cursor Logic */
+      @media (pointer: fine) {
+        body { cursor: none !important; }
+        a, button, [role="button"], .group { cursor: none !important; }
+      }
+      @media (pointer: coarse) {
+        body { cursor: auto !important; }
+        .desktop-only { display: none !important; }
+      }
+
+      .cinzel { font-family: "Cinzel", serif; }
+      .handwriting { font-family: "Dancing Script", cursive; }
+
+      /* Background Canvas */
+      #canvas-bg, #canvas-dust { 
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+        pointer-events: none;
+      }
+      #canvas-bg { z-index: -2; background: radial-gradient(circle at center, #1e0d36 0%, #000000 100%); }
+      #canvas-dust { z-index: -1; mix-blend-mode: screen; }
+
+      /* Masonry Layout */
+      .masonry-container {
+        columns: 1; gap: 2rem; padding: 15px; perspective: 1000px;
+      }
+      @media (min-width: 768px) { .masonry-container { columns: 2; } }
+      @media (min-width: 1024px) { .masonry-container { columns: 3; } }
+
+      .masonry-item {
+        break-inside: avoid; margin-bottom: 3rem; display: block;
+        transform-style: preserve-3d;
+      }
+
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transform-style: preserve-3d;
+      }
+
+      .shine-effect {
+        position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+        background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transform: skewX(-25deg); pointer-events: none; z-index: 20;
+      }
+      @media (hover: hover) {
+        .group:hover .shine-effect { animation: shine 0.7s forwards; }
+      }
+      @keyframes shine { from { left: -100%; } to { left: 150%; } }
+
+      .cursor-blink::after {
+        content: "|"; animation: blink 1s step-start infinite;
+        margin-left: 2px; color: #f472b6;
+      }
+      @keyframes blink { 50% { opacity: 0; } }
+      
+      .modal-blur {
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      }
+
+      ::-webkit-scrollbar { width: 0; }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas-bg"></canvas>
+    <canvas id="canvas-dust"></canvas>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect, useRef, useMemo } = React;
+      const { motion, AnimatePresence, useMotionValue, useSpring, useTransform } = window.Motion;
+
+      const memories = [
+        { id: 1, src: "/textures/img7.jpg", note: "Tấm hình kỷ niệm đầu tiên của hai mình.", date: "21/10/2025" },
+        { id: 2, src: "/textures/img1.jpg", note: "Những ngày khi chúng ta còn bỡ ngỡ khi bắt chuyện với nhau.", date: "22/10/2025" },
+        { id: 3, src: "/textures/img6.jpg", note: "Lúc ra về nhưng lại không muốn rời xa em.", date: "25/10/2025" },
+        { id: 4, src: "/textures/img4.jpg", note: "Buổi đi chơi giống như hẹn hò vậy, anh cứ nhớ mãi.", date: "14/11/2025" },
+        { id: 5, src: "/textures/img8.jpg", note: "Món quà em tặng anh nhân ngày International Men's Day.", date: "19/11/2025" },
+        { id: 6, src: "/textures/img9.png", note: "Em lại đến bên anh với một bất ngờ. Có lẽ trước đó anh đã không nói, nhưng món quà của em khiến anh xúc động rất nhiều!", date: "19/11/2025" },
+        { id: 7, src: "/textures/img2.jpg", note: "Mỗi giây phút bên em, đối với anh đó đều là những món quà.", date: "20/11/2025" },
+      ];
+
+      // --- Custom Cursor ---
+      const GlowCursor = () => {
+        const mouseX = useMotionValue(-100); const mouseY = useMotionValue(-100);
+        const springConfig = { damping: 25, stiffness: 300 };
+        const x = useSpring(mouseX, springConfig); const y = useSpring(mouseY, springConfig);
+        useEffect(() => {
+          const move = (e) => { mouseX.set(e.clientX); mouseY.set(e.clientY); };
+          window.addEventListener("mousemove", move); return () => window.removeEventListener("mousemove", move);
+        }, []);
+        return (
+          <div className="desktop-only pointer-events-none fixed inset-0 z-[9999]">
+            <motion.div style={{ x, y, translateX: "-50%", translateY: "-50%" }} className="w-2 h-2 bg-white rounded-full mix-blend-difference" />
+            <motion.div style={{ x, y, translateX: "-50%", translateY: "-50%" }} className="w-12 h-12 bg-pink-500/30 rounded-full blur-xl" />
+          </div>
+        );
+      };
+
+      // --- Rotating Text ---
+      const RotatingText = () => {
+        const quotes = useMemo(() => ["Cảm ơn em vì đã đến bên anh...", "Mỗi khoảnh khắc là một điều kỳ diệu...", "Yêu em nhiều hơn mỗi ngày...", "Our journey has just begun..."], []);
+        const [text, setText] = useState(""); const [isDeleting, setIsDeleting] = useState(false);
+        const [loopNum, setLoopNum] = useState(0); const [delta, setDelta] = useState(100);
+        useEffect(() => {
+          let ticker = setInterval(() => tick(), delta);
+          return () => clearInterval(ticker);
+        }, [text, delta]);
+        const tick = () => {
+          let i = loopNum % quotes.length; let full = quotes[i];
+          let updated = isDeleting ? full.substring(0, text.length - 1) : full.substring(0, text.length + 1);
+          setText(updated);
+          if (isDeleting) setDelta(40);
+          if (!isDeleting && updated === full) { setIsDeleting(true); setDelta(2000); }
+          else if (isDeleting && updated === "") { setIsDeleting(false); setLoopNum(loopNum + 1); setDelta(100); }
+        };
+        return <span className="cursor-blink">{text}</span>;
+      };
+
+      // --- Anime.js Universe Background (UPDATED) ---
+      const UniverseBackground = () => {
+        useEffect(() => {
+          const cDust = document.getElementById("canvas-dust");
+          const ctx = cDust.getContext("2d");
+          let w = window.innerWidth;
+          let h = window.innerHeight;
+
+          const resize = () => {
+            w = window.innerWidth;
+            h = window.innerHeight;
+            cDust.width = w;
+            cDust.height = h;
+          };
+          window.addEventListener("resize", resize);
+          resize();
+
+          // 1. Tạo dữ liệu hạt (Particles)
+          // Chúng ta tạo ra các đối tượng JS thuần túy, Anime.js sẽ thay đổi giá trị của chúng
+          const particleCount = w < 768 ? 50 : 150;
+          const particles = [];
+          
+          for (let i = 0; i < particleCount; i++) {
+            particles.push({
+              x: Math.random() * w,
+              y: Math.random() * h,
+              radius: Math.random() * 2 + 0.5,
+              alpha: Math.random() * 0.5 + 0.1,
+              color: i % 3 === 0 ? '#f472b6' : '#ffffff' // Mix màu hồng và trắng
+            });
+          }
+
+          // 2. Sử dụng Anime.js để tạo chuyển động
+          // Anime.js sẽ thay đổi thuộc tính x, y, radius, alpha của mảng particles
+          // và gọi hàm update để vẽ lại canvas trên mỗi khung hình
+          const animation = anime({
+            targets: particles,
+            x: function(p) { return p.x + anime.random(-100, 100); },
+            y: function(p) { return p.y + anime.random(-100, 100); },
+            radius: function(p) { return p.radius * (Math.random() * 1.5 + 0.5); }, // Hiệu ứng co giãn nhẹ
+            alpha: function(p) { return p.alpha + (Math.random() * 0.4 - 0.2); }, // Hiệu ứng lấp lánh
+            duration: function() { return anime.random(3000, 8000); }, // Thời gian ngẫu nhiên
+            easing: 'easeInOutQuad',
+            direction: 'alternate',
+            loop: true,
+            update: function() {
+              // 3. Hàm Render: Xóa canvas và vẽ lại các hạt ở vị trí mới
+              ctx.clearRect(0, 0, w, h);
+              
+              particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2, true);
+                ctx.fillStyle = p.color; // Màu sắc (đã chuyển thành hex/rgba string nếu cần)
+                
+                // Hack nhẹ để xử lý alpha vì fillStyle string hơi khó animate trực tiếp phần alpha
+                // Ta set globalAlpha của context
+                ctx.globalAlpha = Math.max(0, Math.min(1, p.alpha)); 
+                ctx.fill();
+                ctx.globalAlpha = 1; // Reset
+              });
+            }
+          });
+
+          return () => {
+            animation.pause();
+            window.removeEventListener("resize", resize);
+          };
+        }, []);
+
+        return null;
+      };
+
+      // --- ALIVE CARD WITH SMOOTH SPRING PHYSICS ---
+      const AliveCard = ({ item, onSelect }) => {
+        // Raw mouse position values (normalized -0.5 to 0.5)
+        const x = useMotionValue(0);
+        const y = useMotionValue(0);
+
+        // --- SPRING PHYSICS MAGIC ---
+        const springConfig = { damping: 20, stiffness: 150 }; 
+        const springX = useSpring(x, springConfig);
+        const springY = useSpring(y, springConfig);
+
+        // Map spring values to rotation degrees
+        const rotateX = useTransform(springY, [-0.5, 0.5], [15, -15]); 
+        const rotateY = useTransform(springX, [-0.5, 0.5], [-15, 15]);
+
+        const randomDuration = useMemo(() => 3 + Math.random() * 2, []);
+        const randomDelay = useMemo(() => Math.random() * 2, []);
+
+        const handleMouseMove = (e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          const width = rect.width;
+          const height = rect.height;
+          // Calculate relative position from center (-0.5 to 0.5)
+          const mouseX = e.clientX - rect.left;
+          const mouseY = e.clientY - rect.top;
+          const xPct = mouseX / width - 0.5;
+          const yPct = mouseY / height - 0.5;
+          
+          x.set(xPct);
+          y.set(yPct);
+        };
+
+        const handleMouseLeave = () => {
+          x.set(0);
+          y.set(0);
+        };
+
+        return (
+          <div className="masonry-item" style={{ perspective: 1000 }}>
+            {/* 1. Floating Animation (Ambient) */}
+            <motion.div
+              animate={{ y: [0, -15, 0] }}
+              transition={{ duration: randomDuration, repeat: Infinity, ease: "easeInOut", delay: randomDelay }}
+            >
+              {/* 2. Interactive Tilt (Spring Physics) */}
+              <motion.div
+                layoutId={`card-${item.id}`}
+                style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                onClick={() => onSelect(item)}
+                className="relative rounded-2xl overflow-hidden glass-panel cursor-pointer group shadow-2xl"
+              >
+                <div className="shine-effect" />
+                
+                {/* Border Glow */}
+                <div className="absolute inset-0 rounded-2xl ring-1 ring-white/10 group-hover:ring-pink-400/50 transition-all duration-500 z-10" />
+                
+                <motion.img 
+                  layoutId={`img-${item.id}`}
+                  src={item.src} 
+                  className="w-full h-auto object-cover block opacity-90 group-hover:opacity-100 transition-all duration-500 transform group-hover:scale-105" 
+                  alt="Memory"
+                />
+                
+                <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/90 to-transparent pt-12 translate-y-2 group-hover:translate-y-0 transition-transform duration-500 z-20">
+                  <motion.p layoutId={`date-${item.id}`} className="cinzel text-[10px] text-pink-400 font-bold tracking-widest uppercase mb-1">
+                    {item.date}
+                  </motion.p>
+                  <p className="text-xs text-white/80 line-clamp-1 italic font-light">{item.note}</p>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
+        );
+      };
+
+      // --- MODAL ---
+      const Modal = ({ selected, onClose }) => {
+        return (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[2000] flex items-center justify-center p-4 modal-blur"
+            onClick={onClose}
+          >
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-pink-600/20 rounded-full blur-[100px] pointer-events-none" />
+
+            <motion.div 
+              layoutId={`card-${selected.id}`}
+              className="relative w-full max-w-5xl bg-[#111] rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-2xl border border-white/10 max-h-[85vh] z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="md:w-3/5 bg-black/40 relative flex items-center justify-center overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/30 pointer-events-none" />
+                <motion.div
+                  animate={{ y: [0, -10, 0], scale: [1, 1.02, 1] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                  className="w-full h-full flex items-center justify-center p-4"
+                >
+                  <motion.img 
+                    layoutId={`img-${selected.id}`}
+                    src={selected.src} 
+                    className="w-full h-full object-contain max-h-[50vh] md:max-h-full drop-shadow-2xl"
+                  />
+                </motion.div>
+              </div>
+
+              <div className="md:w-2/5 p-8 flex flex-col bg-zinc-900/90 backdrop-blur-md relative border-l border-white/5">
+                <button 
+                  onClick={onClose}
+                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/50 hover:bg-white/20 hover:text-white transition-colors"
+                >
+                  ✕
+                </button>
+
+                <div className="mt-2 mb-6">
+                  <motion.span layoutId={`date-${selected.id}`} className="cinzel text-pink-500 text-xs font-bold tracking-[0.2em] uppercase">
+                    {selected.date}
+                  </motion.span>
+                </div>
+
+                <div className="overflow-y-auto pr-2 custom-scroll flex-1">
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }} 
+                    animate={{ opacity: 1, y: 0 }} 
+                    transition={{ delay: 0.3, duration: 0.8 }}
+                    className="handwriting text-2xl md:text-3xl text-gray-100 leading-relaxed"
+                  >
+                    "{selected.note}"
+                  </motion.div>
+                </div>
+
+                <motion.div 
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
+                  className="mt-6 pt-6 border-t border-white/5 flex items-center gap-2"
+                >
+                  <div className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
+                  <span className="text-[10px] text-white/30 uppercase tracking-widest">Memory Logged</span>
+                </motion.div>
+              </div>
+
+            </motion.div>
+          </motion.div>
+        );
+      };
+
+      const App = () => {
+        const [selected, setSelected] = useState(null);
+        return (
+          <>
+            <GlowCursor />
+            <UniverseBackground />
+            
+            <main className="relative z-10 w-full min-h-screen pb-10">
+              <section className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
+                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.5, ease: "easeOut" }}>
+                  <h1 className="cinzel text-5xl md:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-white via-pink-200 to-pink-500 mb-6 drop-shadow-[0_0_15px_rgba(236,72,153,0.3)]">
+                    Eternal Love
+                  </h1>
+                  <div className="h-8 flex items-center justify-center">
+                    <p className="text-pink-300/80 text-sm md:text-lg tracking-[0.3em] font-light uppercase">
+                      <RotatingText />
+                    </p>
+                  </div>
+                </motion.div>
+                
+                <motion.div 
+                  animate={{ y: [0, 10, 0], opacity: [0.3, 1, 0.3] }} 
+                  transition={{ duration: 2, repeat: Infinity }} 
+                  className="absolute bottom-10"
+                >
+                  <span className="text-[10px] text-white/30 uppercase tracking-widest">Scroll Down</span>
+                </motion.div>
+              </section>
+
+              <section className="max-w-7xl mx-auto px-4 md:px-8">
+                <div className="masonry-container">
+                  {memories.map((item, index) => (
+                    <AliveCard key={item.id} item={item} index={index} onSelect={setSelected} />
+                  ))}
+                </div>
+              </section>
+            </main>
+
+            <AnimatePresence>
+              {selected && <Modal selected={selected} onClose={() => setSelected(null)} />}
+            </AnimatePresence>
+          </>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
