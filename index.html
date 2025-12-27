@@ -80,7 +80,7 @@
         * { cursor: none !important; }
         .cursor-dot, .cursor-outline {
           position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
-          border-radius: 50%; z-index: 10000000000; pointer-events: none; will-change: transform;
+          border-radius: 50%; z-index: 1000000000; pointer-events: none; will-change: transform;
         }
         .cursor-dot { width: 8px; height: 8px; background-color: var(--accent-color); }
         .cursor-outline {
@@ -145,9 +145,17 @@
         opacity: 0;
         transform: translateY(50px);
       }
+      
+      @media (max-width: 768px) {
+          .story-card {
+              transition: transform 0.6s ease-out, opacity 0.6s ease-out;
+          }
+      }
+
       @media (min-width: 769px) {
         .story-card { transform: rotateX(-90deg); }
       }
+      
       .story-line {
         display: block; margin-bottom: 15px; font-size: 1.2rem;
         opacity: 0; transform: translateY(20px);
@@ -210,7 +218,7 @@
         0%, 100% { transform: scale(1); } 50% { transform: scale(1.2) rotate(5deg); }
       }
 
-      /* --- POLAROID MODAL STYLES (NEW) --- */
+      /* --- POLAROID MODAL STYLES --- */
       .modal {
         position: fixed; inset: 0; display: flex; justify-content: center;
         align-items: center; z-index: 100002; 
@@ -225,17 +233,18 @@
 
       .modal-content {
         position: relative;
-        /* Style Polaroid */
         background: #fff;
-        padding: 15px 15px 50px 15px; 
+        padding: 15px;
         border-radius: 4px;
         width: 90%; max-width: 500px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); /* Bóng đổ sâu */
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         transform-origin: center center;
         opacity: 0;
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
       }
       
-      /* Tape Effect (Băng dính trang trí) */
       .modal-content::before {
         content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
         width: 100px; height: 35px;
@@ -249,33 +258,41 @@
 
       .modal-inner {
         width: 100%; overflow: hidden;
-        border: 1px solid #eee; /* Viền mờ quanh ảnh */
+        border: 1px solid #eee;
+        flex-shrink: 0;
+        display: flex; justify-content: center; align-items: center;
+        background: #f8f8f8;
       }
 
       #modal-img {
-        width: 100%; height: auto; 
-        max-height: 60vh; object-fit: cover;
-        display: block;
+        width: 100%; height: auto; max-height: 55vh; object-fit: contain; display: block;
       }
       
       .modal-caption-container {
-        position: absolute; bottom: 0; left: 0; width: 100%;
-        padding: 10px 20px;
-        text-align: center;
-        height: 60px; /* Cố định chiều cao vùng text */
-        display: flex; align-items: center; justify-content: center;
+        position: relative; width: 100%; padding-top: 15px; padding-bottom: 10px; text-align: center;
+        min-height: 60px;
       }
 
       #modal-caption {
         font-family: 'Dancing Script', cursive; 
         color: #444; 
-        font-size: 1.8rem; 
-        line-height: 1.2;
-        transform: rotate(-1deg); /* Chữ viết hơi nghiêng tự nhiên */
+        font-size: clamp(1.5rem, 5vw, 2rem);
+        line-height: 1.3;
+        word-wrap: break-word;
+        display: inline; 
+      }
+
+      .modal-cursor {
+        display: inline-block;
+        width: 2px; height: 1.2em;
+        background-color: var(--accent-color);
+        margin-left: 2px;
+        animation: blink 1s step-end infinite;
+        vertical-align: middle;
       }
       
       .close-modal {
-        position: absolute; top: -20px; right: -20px; width: 40px; height: 40px;
+        position: absolute; top: -15px; right: -15px; width: 40px; height: 40px;
         background: var(--accent-color); color: white; border-radius: 50%;
         display: flex; justify-content: center; align-items: center;
         cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
@@ -284,6 +301,15 @@
         transition: transform 0.3s;
       }
       .close-modal:hover { transform: scale(1.1) rotate(90deg); }
+
+      /* --- SPARK EFFECT STYLE --- */
+      .spark {
+        position: fixed;
+        width: 4px; height: 4px;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 999999;
+      }
 
       .particle {
         position: fixed; pointer-events: none;
@@ -294,8 +320,7 @@
       @media (max-width: 768px) {
         .background-container .blob { filter: blur(40px); opacity: 0.4; }
         .caption-text { font-size: 1.5rem; }
-        .modal-content { width: 85%; padding: 10px 10px 50px 10px; }
-        .close-modal { top: -15px; right: -10px; }
+        .modal-content { width: 85%; }
       }
     </style>
   </head>
@@ -392,7 +417,7 @@
             <img src="" id="modal-img" alt="Memory Detail"/>
         </div>
         <div class="modal-caption-container">
-            <p id="modal-caption"></p>
+            <span id="modal-caption"></span><span class="modal-cursor"></span>
         </div>
       </div>
     </div>
@@ -405,15 +430,15 @@
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
       let rafId = null;
 
-      // Memories Data
+      // Memories Data (GIỮ NGUYÊN)
       const memories = [
-        { id: 1, img: "/textures/img7.jpg", caption: "Kỷ niệm đầu tiên ❤️", date: "21/10/2025" },
-        { id: 2, img: "/textures/img1.jpg", caption: "Ngày bỡ ngỡ...", date: "22/10/2025" },
-        { id: 3, img: "/textures/img6.jpg", caption: "Không muốn rời xa", date: "25/10/2025" },
-        { id: 4, img: "/textures/img4.jpg", caption: "Buổi hẹn hò ấy", date: "14/11/2025" },
-        { id: 5, img: "/textures/img8.jpg", caption: "Món quà bất ngờ", date: "19/11/2025" },
-        { id: 6, img: "/textures/img9.png", caption: "Xúc động lắm...", date: "19/11/2025" },
-        { id: 7, img: "/textures/img2.jpg", caption: "Mỗi ngày bên em", date: "20/11/2025" },
+        { id: 1, img: "/textures/img7.jpg", caption: "Tấm hình kỷ niệm đầu tiên của hai mình.", date: "21/10/2025" },
+        { id: 2, img: "/textures/img1.jpg", caption: "Những ngày khi chúng ta còn bỡ ngỡ khi bắt chuyện với nhau.", date: "22/10/2025" },
+        { id: 3, img: "/textures/img6.jpg", caption: "Lúc ra về nhưng lại không muốn rời xa em.", date: "25/10/2025" },
+        { id: 4, img: "/textures/img4.jpg", caption: "Buổi đi chơi giống như hẹn hò vậy, anh cứ nhớ mãi.", date: "14/11/2025" },
+        { id: 5, img: "/textures/img8.jpg", caption: "Món quà em tặng anh nhân ngày International Men's Day.", date: "19/11/2025" },
+        { id: 6, img: "/textures/img9.png", caption: "Em lại đến bên anh với một bất ngờ. Có lẽ trước đó anh đã không nói, nhưng món quà của em khiến anh xúc động rất nhiều!", date: "19/11/2025" },
+        { id: 7, img: "/textures/img2.jpg", caption: "Mỗi giây phút bên em, đối với anh đó đều là những món quà.", date: "20/11/2025" },
       ];
 
       // --- INITIALIZATION ---
@@ -428,26 +453,56 @@
           `;
         }).join("");
 
-      // --- POLAROID MODAL ANIMATION ---
+      // --- SPARK EFFECT FUNCTION ---
+      // Hàm tạo tia lửa ngay tại vị trí con trỏ
+      function createTyperSpark(element) {
+        if (!element) return;
+        const rect = element.getBoundingClientRect();
+        // Lấy vị trí tâm của con trỏ
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+
+        // Tạo 1-2 hạt tia lửa
+        for (let i = 0; i < 2; i++) {
+            const spark = document.createElement('div');
+            spark.classList.add('spark');
+            spark.style.left = x + 'px';
+            spark.style.top = y + 'px';
+            spark.style.backgroundColor = isMobile ? '#ff4d6d' : (i % 2 === 0 ? '#ffeb3b' : '#ff4d6d'); // Màu vàng hoặc hồng
+            document.body.appendChild(spark);
+
+            anime({
+                targets: spark,
+                translateX: () => anime.random(-15, 15),
+                translateY: () => anime.random(-15, 15),
+                scale: [1, 0],
+                opacity: [1, 0],
+                duration: anime.random(300, 500),
+                easing: 'easeOutExpo',
+                complete: () => spark.remove()
+            });
+        }
+      }
+
+      // --- MODAL WITH TYPEWRITER (NO SHAKE, ADD SPARKS) ---
       const modalEl = document.getElementById('image-modal');
       const modalOverlay = document.querySelector('.modal-overlay');
       const modalContent = document.querySelector('.modal-content');
       const modalImg = document.getElementById('modal-img');
       const modalCaption = document.getElementById('modal-caption');
+      
+      let typeInterval; 
 
       function openModal(imgSrc, captionText) {
         modalImg.src = imgSrc;
-        modalCaption.innerText = captionText;
+        modalCaption.innerText = ""; 
         
         modalEl.style.opacity = 1;
         modalEl.style.pointerEvents = 'auto';
         
-        // Random góc nghiêng khi mở ảnh (-4 đến 4 độ)
         const randomRotate = anime.random(-4, 4);
 
-        const tl = anime.timeline({ easing: 'easeOutExpo', duration: 800 });
-
-        tl
+        anime.timeline({ easing: 'easeOutExpo', duration: 800 })
         .add({
             targets: modalOverlay,
             opacity: [0, 1],
@@ -457,19 +512,35 @@
             targets: modalContent,
             scale: [0.6, 1],
             opacity: [0, 1],
-            rotate: [`${randomRotate*3}deg`, `${randomRotate}deg`], // Xoay nhẹ khi rơi xuống
+            rotate: [`${randomRotate*3}deg`, `${randomRotate}deg`], 
             translateY: [-50, 0],
-            easing: 'spring(1, 80, 10, 0)', // Hiệu ứng nảy tự nhiên
-        }, '-=200')
-        .add({
-            targets: '#modal-caption',
-            opacity: [0, 1],
-            translateY: [10, 0],
-            duration: 600
-        }, '-=600');
+            translateX: 0,
+            easing: 'spring(1, 80, 10, 0)', 
+        }, '-=200');
+
+        clearInterval(typeInterval);
+        
+        // Bắt đầu gõ chữ
+        setTimeout(() => {
+            let i = 0;
+            typeInterval = setInterval(() => {
+                if (i < captionText.length) {
+                    modalCaption.textContent += captionText.charAt(i);
+                    i++;
+                    
+                    // KÍCH HOẠT TIA LỬA TẠI CON TRỎ MODAL
+                    const cursor = document.querySelector('.modal-cursor');
+                    createTyperSpark(cursor);
+
+                } else {
+                    clearInterval(typeInterval);
+                }
+            }, 30);
+        }, 500);
       }
 
       function closeModal() {
+        clearInterval(typeInterval);
         const tl = anime.timeline({
             easing: 'easeInBack',
             duration: 400,
@@ -484,7 +555,7 @@
             targets: modalContent,
             scale: 0.8,
             opacity: 0,
-            translateY: 50 // Rơi xuống khi đóng
+            translateY: 50 
         })
         .add({
             targets: modalOverlay,
@@ -526,7 +597,7 @@
       }
       createFloatingHearts();
 
-      // --- TYPEWRITER & OTHER LOGIC (KEEP SAME) ---
+      // --- TYPEWRITER (HERO SECTION WITH SPARKS) ---
       function typeWriter(element, text, speed, callback, cursorElement) {
         let i = 0;
         element.textContent = "";
@@ -535,6 +606,8 @@
           if (i < text.length) {
             element.textContent += text.charAt(i);
             i++;
+            // KÍCH HOẠT TIA LỬA TẠI CON TRỎ HERO
+            createTyperSpark(cursorElement);
             setTimeout(type, speed);
           } else {
             if (callback) callback();
@@ -597,6 +670,7 @@
         loop();
       }
 
+      // --- SCROLL EFFECTS ---
       const blob1 = document.getElementById("blob1");
       const blob2 = document.getElementById("blob2");
       const storySection = document.getElementById("story");
@@ -639,15 +713,13 @@
                 storyCard.style.transform = `rotateX(${rotation}deg) translate3d(0, ${translateY}px, 0)`;
                 storyCard.style.opacity = Math.min(1, opacity + 0.2); 
             } else {
-                let opacityMobile = 0;
-                let translateMobile = 50;
-                if (fraction > 0.1 && fraction < 0.9) {
-                    opacityMobile = 1;
-                    translateMobile = 0;
+                if (fraction > 0.05 && fraction < 1.1) {
+                    storyCard.style.opacity = 1;
+                    storyCard.style.transform = "translateY(0)";
+                } else {
+                    storyCard.style.opacity = 0;
+                    storyCard.style.transform = "translateY(50px)";
                 }
-                storyCard.style.transition = "transform 0.5s ease-out, opacity 0.5s ease-out";
-                storyCard.style.opacity = opacityMobile;
-                storyCard.style.transform = `translate3d(0, ${translateMobile}px, 0)`;
             }
 
             storyLines.forEach((line, index) => {
