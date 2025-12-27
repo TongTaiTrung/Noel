@@ -2,8 +2,11 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>2 Months of Us</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>2 Months of Us | Forever Together</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,7 +25,7 @@
         --primary-color: #ff8fa3;
         --accent-color: #ff4d6d;
         --text-color: #594a4e;
-        --card-bg: rgba(255, 255, 255, 0.7);
+        --card-bg: rgba(255, 255, 255, 0.75);
         --font-heading: "Dancing Script", cursive;
         --font-body: "Quicksand", sans-serif;
       }
@@ -31,559 +34,321 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        cursor: none !important;
-        user-select: none;
+        -webkit-tap-highlight-color: transparent;
       }
 
       body {
-        /* 1. BACKGROUND GRADIENT ANIMATION */
         background: linear-gradient(-45deg, #fff0f3, #ffe6e9, #fff0f5, #ffd1dc);
         background-size: 400% 400%;
         animation: gradientBG 15s ease infinite;
-
         font-family: var(--font-body);
         color: var(--text-color);
         overflow-x: hidden;
-        position: relative;
+        user-select: none;
+        -webkit-overflow-scrolling: touch;
       }
 
       @keyframes gradientBG {
-        0% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-        100% {
-          background-position: 0% 50%;
-        }
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
       }
 
-      /* --- SCROLL PROGRESS BAR --- */
+      /* --- SCROLL PROGRESS --- */
       .scroll-progress {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 4px;
-        background: var(--accent-color);
-        width: 0%;
-        z-index: 99999;
-        box-shadow: 0 0 10px var(--accent-color);
+        position: fixed; top: 0; left: 0; height: 5px;
+        background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+        width: 0%; z-index: 100001;
+        box-shadow: 0 0 15px rgba(255, 77, 109, 0.5);
       }
 
-      /* --- BACKGROUND BLOBS (Parallax Targets) --- */
+      /* --- BACKGROUND ELEMENTS --- */
       .background-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -2;
-        overflow: hidden;
-        perspective: 1000px;
+        position: fixed; inset: 0; z-index: -2; overflow: hidden; pointer-events: none;
       }
       .blob {
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(40px);
-        opacity: 0.6;
-        will-change: transform; /* Tối ưu hiệu năng */
+        position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.6; 
+        will-change: transform;
+      }
+      
+      .bg-heart {
+        position: absolute; color: var(--primary-color); opacity: 0; z-index: -1; filter: blur(1px);
       }
 
-      /* --- HEART DUST --- */
-      .heart-dust {
-        position: fixed;
-        color: #fff;
-        z-index: -1;
-        pointer-events: none;
-        opacity: 0;
-        text-shadow: 0 0 5px rgba(255, 77, 109, 0.8);
-        font-size: 10px;
-        will-change: transform, opacity;
-      }
-
-      /* --- CUSTOM CURSOR --- */
-      .cursor-dot,
-      .cursor-outline {
-        position: fixed;
-        top: 0;
-        left: 0;
-        transform: translate(-50%, -50%);
-        border-radius: 50%;
-        z-index: 100000;
-        pointer-events: none;
-      }
-      .cursor-dot {
-        width: 8px;
-        height: 8px;
-        background-color: var(--accent-color);
-      }
-      .cursor-outline {
-        width: 40px;
-        height: 40px;
-        border: 2px solid var(--primary-color);
-        transition: width 0.2s, height 0.2s;
-      }
-
-      /* --- MUSIC BUTTON --- */
-      .music-btn {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 100;
-        background: rgba(255, 255, 255, 0.8);
-        border: 2px solid var(--primary-color);
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        color: var(--accent-color);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s;
-      }
-      .music-btn:hover {
-        transform: scale(1.1);
-      }
-      .music-anim {
-        animation: spin 3s linear infinite;
-      }
-      @keyframes spin {
-        100% {
-          transform: rotate(360deg);
+      /* --- CURSOR (PC Only) --- */
+      @media (pointer: fine) {
+        * { cursor: none !important; }
+        .cursor-dot, .cursor-outline {
+          position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
+          border-radius: 50%; z-index: 10000000000; pointer-events: none; will-change: transform;
+        }
+        .cursor-dot { width: 8px; height: 8px; background-color: var(--accent-color); }
+        .cursor-outline {
+          width: 40px; height: 40px; border: 2px solid var(--primary-color);
+          transition: width 0.3s, height 0.3s, background 0.3s;
         }
       }
+      @media (pointer: coarse) {
+        .cursor-dot, .cursor-outline { display: none; }
+      }
+
+      /* --- UI ELEMENTS --- */
+      .music-btn {
+        position: fixed; top: 20px; right: 20px; z-index: 1000;
+        background: var(--card-bg); border: 2px solid var(--primary-color);
+        border-radius: 50%; width: 50px; height: 50px;
+        display: flex; justify-content: center; align-items: center;
+        color: var(--accent-color); box-shadow: 0 8px 20px rgba(255, 143, 163, 0.3);
+        backdrop-filter: blur(10px); cursor: pointer;
+        transition: transform 0.3s;
+      }
+      .music-btn:active { transform: scale(0.9); }
+      .music-anim { animation: spin 4s linear infinite; }
+      @keyframes spin { 100% { transform: rotate(360deg); } }
 
       section {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 2rem;
-        position: relative;
+        min-height: 100vh; display: flex; flex-direction: column;
+        justify-content: center; align-items: center; padding: 2rem; position: relative;
       }
 
       /* --- HERO SECTION --- */
-      .hero-section {
-        text-align: center;
-        z-index: 2;
+      .ml11 {
+        font-family: var(--font-heading); font-size: clamp(2.5rem, 8vw, 5.5rem);
+        color: var(--accent-color); overflow: hidden; text-align: center;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
       }
-
-      h1.ml11 {
-        font-family: var(--font-heading);
-        font-size: 5rem;
-        color: var(--accent-color);
-        line-height: 1.2;
-        text-shadow: 2px 2px 10px rgba(255, 77, 109, 0.2);
+      .typewriter-cursor {
+        display: inline-block; animation: blink 1s step-end infinite;
       }
+      .typewriter-cursor.hidden { display: none; }
+      @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
       .subtitle {
-        font-size: 1.5rem;
-        margin-top: 20px;
-        font-weight: 600;
-        opacity: 0;
-        background: linear-gradient(to right, #ff8fa3, #ff4d6d);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        font-size: clamp(1rem, 4vw, 1.5rem); margin-top: 20px; font-weight: 600;
+        background: linear-gradient(45deg, #ff8fa3, #ff4d6d);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        text-align: center; min-height: 1.5em;
       }
 
-      .scroll-indicator {
-        position: absolute;
-        bottom: 40px;
-        color: var(--accent-color);
-        animation: bounce 2s infinite;
-        font-size: 2rem;
-      }
-
-      /* --- STORY SECTION (Updated for 3D Effect) --- */
-      .story-section {
-        perspective: 1500px; /* Tạo chiều sâu 3D */
-      }
-
+      /* --- STORY CARD --- */
+      .story-section { perspective: 1500px; }
       .story-card {
         background: var(--card-bg);
-        padding: 4rem;
-        border-radius: 30px;
-        backdrop-filter: blur(15px);
-        box-shadow: 0 20px 50px rgba(255, 143, 163, 0.3);
-        max-width: 700px;
-        text-align: center;
-        border: 1px solid rgba(255, 255, 255, 0.8);
-
-        /* Initial State cho Anime.js */
-        opacity: 0;
+        padding: clamp(2rem, 5vw, 4rem); border-radius: 40px;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 30px 60px rgba(255, 143, 163, 0.2);
+        max-width: 800px; width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.5);
         transform-style: preserve-3d;
-        transform: rotateX(20deg) translateY(100px);
-      }
-
-      .story-card h2 {
-        font-family: var(--font-heading);
-        font-size: 3rem;
-        color: var(--accent-color);
-        margin-bottom: 1.5rem;
-      }
-
-      /* Tách từng dòng text để animate */
-      .story-line {
-        display: block;
+        transform-origin: center top; 
+        will-change: transform, opacity;
         opacity: 0;
-        transform: translateY(20px);
-        font-size: 1.2rem;
-        line-height: 1.8;
-        margin-bottom: 5px;
+        transform: translateY(50px);
+      }
+      @media (min-width: 769px) {
+        .story-card { transform: rotateX(-90deg); }
+      }
+      .story-line {
+        display: block; margin-bottom: 15px; font-size: 1.2rem;
+        opacity: 0; transform: translateY(20px);
+        will-change: transform, opacity;
       }
 
-      /* --- MEMORY GALLERY --- */
-      .memory-section {
-        perspective: 1000px;
-      }
+      /* --- GALLERY --- */
+      .memory-section { padding-top: 4rem; padding-bottom: 4rem; }
       .gallery-grid {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 2rem;
-        max-width: 1200px;
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2.5rem; width: 100%; max-width: 1200px;
       }
       .memory-card {
-        width: 280px;
-        height: 380px;
-        background: #fff;
-        padding: 15px 15px 50px 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-        transition: transform 0.3s ease, z-index 0.3s;
+        background: #fff; padding: 12px 12px 55px 12px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        border-radius: 4px; opacity: 0; 
+        cursor: pointer; 
+        transition: box-shadow 0.3s ease;
         position: relative;
-        transform-origin: center;
-        opacity: 0;
-        border-radius: 2px;
-        cursor: pointer;
+        will-change: transform;
       }
-      .memory-card:nth-child(odd) {
-        transform: rotate(-3deg);
+      @keyframes floatIdle {
+        0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+        50% { transform: translateY(-10px) rotate(var(--r, 0deg)); }
       }
-      .memory-card:nth-child(even) {
-        transform: rotate(3deg);
-      }
-      .memory-card:hover {
-        transform: scale(1.1) rotate(0deg) !important;
-        z-index: 10;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-      }
+      .memory-card.animate-idle { animation: floatIdle 4s ease-in-out infinite; }
+      .memory-card:nth-child(2n) { animation-delay: 0.5s; }
+      .memory-card:nth-child(3n) { animation-delay: 1s; }
+      .memory-card:nth-child(5n) { animation-delay: 1.5s; }
+      .memory-card:hover { z-index: 10; box-shadow: 0 25px 45px rgba(255, 77, 109, 0.3); }
       .card-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border: 1px solid #eee;
-        pointer-events: none;
+        width: 100%; height: 300px; object-fit: cover; border-radius: 2px;
+        background: #f0f0f0;
       }
       .caption-text {
-        position: absolute;
-        bottom: 15px;
-        left: 0;
-        width: 100%;
-        text-align: center;
-        font-family: "Dancing Script", cursive;
-        font-size: 1.8rem;
-        color: #555;
-      }
-
-      /* --- MODAL --- */
-      .modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 10000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        opacity: 0;
-        pointer-events: none;
-      }
-      .modal-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 240, 243, 0.85);
-        backdrop-filter: blur(8px);
-      }
-      .modal-content {
-        position: relative;
-        background: #fff;
-        padding: 15px;
-        border-radius: 15px;
-        max-width: 90%;
-        max-height: 90%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
-        transform: scale(0.8);
-        border: 10px solid #fff;
-        outline: 2px dashed var(--primary-color);
-      }
-      .modal-img {
-        max-width: 100%;
-        max-height: 55vh;
-        border-radius: 5px;
-        object-fit: contain;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      }
-      .modal-decoration {
-        font-size: 1.5rem;
-        color: var(--accent-color);
-        margin: 10px 0 5px 0;
-      }
-      .modal-caption {
-        font-family: "Dancing Script", cursive;
-        font-size: 2rem;
-        color: var(--text-color);
-        text-align: center;
-        line-height: 1.3;
-        max-width: 80%;
-      }
-      .close-modal {
-        position: absolute;
-        top: -20px;
-        right: -20px;
-        width: 40px;
-        height: 40px;
-        background: var(--accent-color);
-        color: white;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 1.2rem;
-        cursor: pointer;
-        transition: transform 0.2s;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        z-index: 10001;
-      }
-      .close-modal:hover {
-        transform: scale(1.1) rotate(90deg);
+        position: absolute; bottom: 15px; left: 0; width: 100%;
+        text-align: center; font-family: "Dancing Script", cursive;
+        font-size: 1.8rem; color: #555;
       }
 
       /* --- COUNTER --- */
       .counter-box {
-        background: rgba(255, 255, 255, 0.5);
-        padding: 3rem;
-        border-radius: 50%;
-        width: 350px;
-        height: 350px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 0 40px rgba(255, 77, 109, 0.2);
+        background: var(--card-bg); backdrop-filter: blur(15px);
+        width: clamp(280px, 80vw, 380px); height: clamp(280px, 80vw, 380px);
+        border-radius: 50%; display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
         border: 2px dashed var(--primary-color);
-        position: relative;
+        box-shadow: 0 0 50px rgba(255, 143, 163, 0.2);
+        will-change: transform;
       }
-      .counter-box::before {
-        content: "";
-        position: absolute;
-        top: -10px;
-        left: -10px;
-        right: -10px;
-        bottom: -10px;
-        border-radius: 50%;
-        border: 2px solid transparent;
-        border-top-color: var(--accent-color);
-        border-bottom-color: var(--accent-color);
-        animation: spin 10s linear infinite;
-      }
-      .number-wrapper {
-        font-size: 6rem;
-        font-weight: 700;
-        color: var(--accent-color);
-        line-height: 1;
-      }
+      #days-count { font-size: clamp(4rem, 12vw, 7rem); font-weight: 700; color: var(--accent-color); }
 
       /* --- FINAL --- */
       .heart-btn {
-        font-size: 5rem;
-        background: none;
-        border: none;
-        transition: transform 0.2s;
-        animation: heartbeat 1.5s infinite;
+        font-size: clamp(4rem, 10vw, 6rem); background: none; border: none;
+        filter: drop-shadow(0 0 15px rgba(255, 77, 109, 0.4));
+        animation: heartbeat 1.5s infinite; cursor: pointer; z-index: 100;
       }
       @keyframes heartbeat {
-        0%,
-        100% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.2);
-        }
-      }
-      @keyframes bounce {
-        0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-        40% {transform: translateY(-10px);}
-        60% {transform: translateY(-5px);}
-      }
-      .particle {
-        position: fixed;
-        pointer-events: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff4d6d'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E");
-        background-size: cover;
-        width: 30px;
-        height: 30px;
-        z-index: 9999;
+        0%, 100% { transform: scale(1); } 50% { transform: scale(1.2) rotate(5deg); }
       }
 
-      /* Responsive */
+      /* --- POLAROID MODAL STYLES (NEW) --- */
+      .modal {
+        position: fixed; inset: 0; display: flex; justify-content: center;
+        align-items: center; z-index: 100002; 
+        pointer-events: none; opacity: 0;
+      }
+      
+      .modal-overlay {
+        position: absolute; inset: 0; background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(5px);
+        opacity: 0;
+      }
+
+      .modal-content {
+        position: relative;
+        /* Style Polaroid */
+        background: #fff;
+        padding: 15px 15px 50px 15px; 
+        border-radius: 4px;
+        width: 90%; max-width: 500px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); /* Bóng đổ sâu */
+        transform-origin: center center;
+        opacity: 0;
+      }
+      
+      /* Tape Effect (Băng dính trang trí) */
+      .modal-content::before {
+        content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+        width: 100px; height: 35px;
+        background-color: rgba(255, 255, 255, 0.3);
+        border-left: 1px dashed rgba(0,0,0,0.1);
+        border-right: 1px dashed rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        backdrop-filter: blur(2px);
+        z-index: 2;
+      }
+
+      .modal-inner {
+        width: 100%; overflow: hidden;
+        border: 1px solid #eee; /* Viền mờ quanh ảnh */
+      }
+
+      #modal-img {
+        width: 100%; height: auto; 
+        max-height: 60vh; object-fit: cover;
+        display: block;
+      }
+      
+      .modal-caption-container {
+        position: absolute; bottom: 0; left: 0; width: 100%;
+        padding: 10px 20px;
+        text-align: center;
+        height: 60px; /* Cố định chiều cao vùng text */
+        display: flex; align-items: center; justify-content: center;
+      }
+
+      #modal-caption {
+        font-family: 'Dancing Script', cursive; 
+        color: #444; 
+        font-size: 1.8rem; 
+        line-height: 1.2;
+        transform: rotate(-1deg); /* Chữ viết hơi nghiêng tự nhiên */
+      }
+      
+      .close-modal {
+        position: absolute; top: -20px; right: -20px; width: 40px; height: 40px;
+        background: var(--accent-color); color: white; border-radius: 50%;
+        display: flex; justify-content: center; align-items: center;
+        cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        font-size: 1.2rem; z-index: 10;
+        border: 3px solid white;
+        transition: transform 0.3s;
+      }
+      .close-modal:hover { transform: scale(1.1) rotate(90deg); }
+
+      .particle {
+        position: fixed; pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff4d6d'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E");
+        background-size: contain; width: 25px; height: 25px; z-index: 10000;
+      }
+
       @media (max-width: 768px) {
-        * {
-          cursor: auto !important;
-        }
-        .cursor-dot,
-        .cursor-outline {
-          display: none;
-        }
-        h1.ml11 {
-          font-size: 3rem;
-        }
-        .story-card {
-          padding: 2rem;
-          width: 90%;
-        }
-        .counter-box {
-          width: 280px;
-          height: 280px;
-        }
-        .number-wrapper {
-          font-size: 4rem;
-        }
-        .gallery-grid {
-          gap: 1rem;
-        }
-        .memory-card {
-          width: 100%;
-          max-width: 300px;
-          transform: rotate(0deg) !important;
-        }
-        .modal-content {
-          width: 90%;
-          padding: 10px;
-          border: 5px solid #fff;
-        }
-        .modal-caption {
-          font-size: 1.5rem;
-        }
+        .background-container .blob { filter: blur(40px); opacity: 0.4; }
+        .caption-text { font-size: 1.5rem; }
+        .modal-content { width: 85%; padding: 10px 10px 50px 10px; }
+        .close-modal { top: -15px; right: -10px; }
       }
     </style>
   </head>
   <body>
     <div class="scroll-progress" id="scroll-progress"></div>
-
-    <div class="modal" id="image-modal">
-      <div class="modal-overlay" onclick="closeModal()"></div>
-      <div class="modal-content">
-        <div class="close-modal" onclick="closeModal()">
-          <i class="fas fa-times"></i>
-        </div>
-        <img src="" alt="Full Image" class="modal-img" id="modal-img" />
-        <div class="modal-decoration">
-          <i class="fas fa-heart" style="color: #ff4d6d"></i>
-        </div>
-        <p class="modal-caption" id="modal-caption"></p>
-      </div>
-    </div>
-
-    <audio id="bg-music" loop>
-      <source
-        src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-        type="audio/mp3"
-      />
-    </audio>
-
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
 
-    <div class="background-container">
-      <div
-        class="blob"
-        id="blob1"
-        style="
-          background: #ffc2d1;
-          width: 400px;
-          height: 400px;
-          top: 10%;
-          left: 10%;
-        "
-      ></div>
-      <div
-        class="blob"
-        id="blob2"
-        style="
-          background: #ffe5ec;
-          width: 500px;
-          height: 500px;
-          top: 50%;
-          right: 10%;
-        "
-      ></div>
-      <div
-        class="blob"
-        id="blob3"
-        style="
-          background: #ffccd5;
-          width: 300px;
-          height: 300px;
-          bottom: 10%;
-          left: 30%;
-        "
-      ></div>
+    <button class="music-btn" id="music-toggle" onclick="toggleMusic()">
+      <i class="fas fa-music"></i>
+    </button>
+    <audio id="bg-music" loop>
+      <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3" />
+    </audio>
+
+    <div class="background-container" id="bg-container">
+      <div class="blob" id="blob1" style="background: #ffc2d1; width: 40vw; height: 40vw; top: 5%; left: -10%;"></div>
+      <div class="blob" id="blob2" style="background: #ffe5ec; width: 50vw; height: 50vw; top: 40%; right: -15%;"></div>
+      <div class="blob" id="blob3" style="background: #ffccd5; width: 35vw; height: 35vw; bottom: 0%; left: 15%;"></div>
+      <div id="hearts-container"></div>
     </div>
 
     <section class="hero-section">
-      <h1 class="ml11">
-        <span class="text-wrapper">
-          <span class="line line1"></span>
-          <span class="letters">Happy 2 Months Anniversary</span>
-        </span>
+      <h1 class="ml11" id="typewriter-title">
+        <span class="typewriter-text"></span>
+        <span class="typewriter-cursor">|</span>
       </h1>
-      <p class="subtitle">
-        Cảm ơn vì đã đến bên anh
-        <i class="fas fa-heart" style="color: #ff4d6d"></i>
+      <p class="subtitle" id="typewriter-subtitle">
+        <span class="subtitle-text"></span>
+        <span class="typewriter-cursor hidden">|</span>
       </p>
-      <div class="scroll-indicator">
-        <i class="fas fa-chevron-down"></i>
+      <div class="scroll-indicator" style="margin-top: 40px; animation: bounce 2s infinite">
+        <i class="fas fa-chevron-down" style="font-size: 2rem; color: var(--accent-color)"></i>
       </div>
     </section>
 
     <section class="story-section" id="story">
       <div class="story-card">
-        <h2>Câu chuyện nhỏ</h2>
+        <h2 style="text-align: center; margin-bottom: 20px; font-family: var(--font-heading); font-size: 2.5rem; color: var(--accent-color);">Câu chuyện nhỏ</h2>
         <div class="story-content">
           <span class="story-line">Hai tháng trôi qua thật nhanh,</span>
-          <span class="story-line"
-            >nhưng cũng đủ để chúng ta có những kỷ niệm thật đẹp.</span
-          >
+          <span class="story-line">nhưng cũng đủ để chúng ta có những kỷ niệm thật đẹp.</span>
           <span class="story-line">Từ những dòng tin nhắn đầu tiên,</span>
-          <span class="story-line"
-            >những buổi hẹn hò ngại ngùng cho đến lúc này.</span
-          >
-          <span class="story-line"
-            >Mỗi ngày trôi qua, anh lại thấy yêu em nhiều hơn một chút.</span
-          >
+          <span class="story-line">những buổi hẹn hò ngại ngùng cho đến lúc này.</span>
+          <span class="story-line">Mỗi ngày trôi qua, anh lại thấy yêu em nhiều hơn.</span>
         </div>
       </div>
     </section>
 
     <section class="memory-section" id="gallery">
       <h2
-        style="
-          font-family: 'Dancing Script';
-          font-size: 3rem;
-          color: #ff4d6d;
-          margin-bottom: 2rem;
-        "
+        class="gallery-title"
+        style="text-align:center; font-family: 'Dancing Script'; font-size: 3rem; color: #ff4d6d; margin-bottom: 2rem; opacity: 0;"
       >
         Khoảnh khắc của chúng ta
       </h2>
@@ -592,377 +357,424 @@
 
     <section class="counter-section" id="counter">
       <div class="counter-box">
-        <h3 style="font-size: 1.2rem; color: #888">Chúng ta đã bên nhau</h3>
+        <h3 style="font-size: 1.1rem; color: #888; text-transform: uppercase; margin-top: 20px;">
+          Chúng ta đã bên nhau
+        </h3>
         <div class="number-wrapper">
           <span id="days-count">0</span>
         </div>
-        <span class="label" style="font-size: 1.5rem; color: #ff4d6d"
-          >Ngày</span
+        <span class="label" style="font-size: 1.5rem; color: #ff4d6d; font-weight: 600; margin-bottom: 20px;"
+          >Ngày hạnh phúc</span
         >
-        <p class="love-note" style="margin-top: 15px">Và sẽ còn mãi...</p>
       </div>
     </section>
 
-    <section class="final-section" id="final">
-      <div class="heart-container" style="text-align: center">
-        <p style="font-size: 1.5rem; margin-bottom: 20px">Yêu cậu rất nhiều</p>
-        <button id="heart-btn" class="heart-btn">
-          <i class="fas fa-heart" style="color: #ff4d6d"></i>
-        </button>
-        <p
-          class="click-hint"
-          style="margin-top: 10px; font-size: 0.9rem; color: #999"
-        >
-          (Nhấn vào trái tim nhé)
-        </p>
-      </div>
+    <section id="final">
+      <p
+        class="final-text"
+        style="font-size: 1.8rem; margin-bottom: 20px; font-weight: 700; font-family: var(--font-heading); opacity: 0; text-align: center;"
+      >
+        Yêu em mãi mãi!
+      </p>
+      <button id="heart-btn" class="heart-btn" style="opacity: 0">
+        <i class="fas fa-heart" style="color: #ff4d6d"></i>
+      </button>
+      <p class="click-hint" style="font-size: 0.9rem; color: #999; margin-top:10px; opacity:0">
+        (Nhấn vào tim nhé)
+      </p>
     </section>
+
+    <div class="modal" id="image-modal">
+      <div class="modal-overlay" onclick="closeModal()"></div>
+      <div class="modal-content">
+        <div class="close-modal" onclick="closeModal()"><i class="fas fa-times"></i></div>
+        <div class="modal-inner">
+            <img src="" id="modal-img" alt="Memory Detail"/>
+        </div>
+        <div class="modal-caption-container">
+            <p id="modal-caption"></p>
+        </div>
+      </div>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <script>
-      const startDate = new Date(2025, 9, 26);
+      // CONFIGURATION & VARIABLES
+      const startDate = new Date(2025, 9, 26); 
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+      let rafId = null;
+
+      // Memories Data
       const memories = [
-        {
-          img: "/textures/img7.jpg",
-          date: "21/10/2025",
-          caption: "Tấm hình kỷ niệm đầu tiên của hai mình.",
-        },
-        {
-          img: "/textures/img1.jpg",
-          date: "22/10/2025",
-          caption:
-            "Những ngày khi chúng ta còn bỡ ngỡ khi bắt chuyện với nhau.",
-        },
-        {
-          img: "/textures/img6.jpg",
-          date: "25/10/2025",
-          caption: "Lúc ra về nhưng lại không muốn rời xa em.",
-        },
-        {
-          img: "/textures/img4.jpg",
-          date: "14/11/2025",
-          caption: "Buổi đi chơi giống như hẹn hò vậy, anh cứ nhớ mãi.",
-        },
-        {
-          img: "/textures/img8.jpg",
-          date: "19/11/2025",
-          caption: "Món quà em tặng anh nhân ngày International Men's Day.",
-        },
-        {
-          img: "/textures/img9.png",
-          date: "19/11/2025",
-          caption:
-            "Em lại đến bên anh với một bất ngờ. Có lẽ trước đó anh đã không nói, nhưng món quà của em khiến anh xúc động rất nhiều!",
-        },
-        {
-          img: "/textures/img2.jpg",
-          date: "20/11/2025",
-          caption: "Mỗi giây phút bên em, đối với anh đó đều là những món quà.",
-        },
+        { id: 1, img: "/textures/img7.jpg", caption: "Kỷ niệm đầu tiên ❤️", date: "21/10/2025" },
+        { id: 2, img: "/textures/img1.jpg", caption: "Ngày bỡ ngỡ...", date: "22/10/2025" },
+        { id: 3, img: "/textures/img6.jpg", caption: "Không muốn rời xa", date: "25/10/2025" },
+        { id: 4, img: "/textures/img4.jpg", caption: "Buổi hẹn hò ấy", date: "14/11/2025" },
+        { id: 5, img: "/textures/img8.jpg", caption: "Món quà bất ngờ", date: "19/11/2025" },
+        { id: 6, img: "/textures/img9.png", caption: "Xúc động lắm...", date: "19/11/2025" },
+        { id: 7, img: "/textures/img2.jpg", caption: "Mỗi ngày bên em", date: "20/11/2025" },
       ];
 
+      // --- INITIALIZATION ---
       const galleryGrid = document.getElementById("gallery-grid");
-
-      galleryGrid.innerHTML = memories
-        .map(
-          (memory) => `
-            <div class="memory-card" data-caption="${memory.caption}" onclick="openModal(this)">
-                  <img src="${memory.img}" class="card-image" alt="Memory">
-                  <div class="caption-text">${memory.date}</div>
+      galleryGrid.innerHTML = memories.map((m) => {
+            const safeCaption = m.caption.replace(/'/g, "\\'");
+            return `
+            <div class="memory-card" onclick="openModal('${m.img}', '${safeCaption}')">
+              <img src="${m.img}" class="card-image" alt="Memory" loading="lazy">
+              <div class="caption-text">${m.date}</div>
             </div>
-         `
-        )
-        .join("");
+          `;
+        }).join("");
 
-      // --- 1. HEART DUST EFFECT ---
-      function createHeartDust() {
-        const container = document.querySelector(".background-container");
-        const dustCount = 40;
-        for (let i = 0; i < dustCount; i++) {
-          const heart = document.createElement("div");
-          heart.classList.add("heart-dust");
-          heart.innerHTML = '<i class="fas fa-heart"></i>';
-          container.appendChild(heart);
+      // --- POLAROID MODAL ANIMATION ---
+      const modalEl = document.getElementById('image-modal');
+      const modalOverlay = document.querySelector('.modal-overlay');
+      const modalContent = document.querySelector('.modal-content');
+      const modalImg = document.getElementById('modal-img');
+      const modalCaption = document.getElementById('modal-caption');
 
-          const colors = ["#ff8fa3", "#ff4d6d", "#fff", "#ffd1dc"];
-          heart.style.color = colors[Math.floor(Math.random() * colors.length)];
-          heart.style.left = Math.random() * 100 + "vw";
-          heart.style.top = Math.random() * 100 + "vh";
-
-          anime({
-            targets: heart,
-            translateY: [
-              { value: -1000, duration: anime.random(15000, 25000) },
-            ],
-            translateX: [
-              { value: 50, duration: 3000, easing: "easeInOutSine" },
-              { value: -50, duration: 3000, easing: "easeInOutSine" },
-            ],
-            opacity: [
-              { value: 0.8, duration: 1000 },
-              { value: 0, duration: 1000, delay: anime.random(5000, 10000) },
-            ],
-            scale: [0.5, 1.5],
-            loop: true,
-            direction: "alternate",
-            easing: "linear",
-            delay: anime.random(0, 5000),
-          });
-        }
-      }
-      createHeartDust();
-
-      // --- 2. PARALLAX & SCROLL PROGRESS (NEW) ---
-      window.addEventListener("scroll", () => {
-        const scrollY = window.scrollY;
-        const docHeight = document.body.scrollHeight - window.innerHeight;
-
-        // Progress Bar
-        const progress = (scrollY / docHeight) * 100;
-        document.getElementById("scroll-progress").style.width = `${progress}%`;
-
-        // Parallax Blobs (Hiệu ứng cuộn lệch)
-        // Di chuyển blob với tốc độ khác nhau dựa trên scrollY
-        const blob1 = document.getElementById("blob1");
-        const blob2 = document.getElementById("blob2");
-        const blob3 = document.getElementById("blob3");
-
-        if (blob1) blob1.style.transform = `translateY(${scrollY * 0.2}px)`;
-        if (blob2) blob2.style.transform = `translateY(${scrollY * -0.3}px)`;
-        if (blob3) blob3.style.transform = `translateY(${scrollY * 0.1}px)`;
-      });
-
-      // --- 3. MODAL LOGIC ---
-      const modal = document.getElementById("image-modal");
-      const modalImg = document.getElementById("modal-img");
-      const modalCaption = document.getElementById("modal-caption");
-
-      function openModal(element) {
-        const imgSrc = element.querySelector("img").src;
-        const captionText = element.getAttribute("data-caption");
+      function openModal(imgSrc, captionText) {
         modalImg.src = imgSrc;
-        modalCaption.textContent = captionText;
-        modal.style.pointerEvents = "auto";
-        anime({
-          targets: modal,
-          opacity: [0, 1],
-          duration: 300,
-          easing: "linear",
-        });
-        anime({
-          targets: ".modal-content",
-          scale: [0.5, 1],
-          duration: 500,
-          easing: "easeOutElastic(1, .8)",
-        });
+        modalCaption.innerText = captionText;
+        
+        modalEl.style.opacity = 1;
+        modalEl.style.pointerEvents = 'auto';
+        
+        // Random góc nghiêng khi mở ảnh (-4 đến 4 độ)
+        const randomRotate = anime.random(-4, 4);
+
+        const tl = anime.timeline({ easing: 'easeOutExpo', duration: 800 });
+
+        tl
+        .add({
+            targets: modalOverlay,
+            opacity: [0, 1],
+            duration: 400
+        })
+        .add({
+            targets: modalContent,
+            scale: [0.6, 1],
+            opacity: [0, 1],
+            rotate: [`${randomRotate*3}deg`, `${randomRotate}deg`], // Xoay nhẹ khi rơi xuống
+            translateY: [-50, 0],
+            easing: 'spring(1, 80, 10, 0)', // Hiệu ứng nảy tự nhiên
+        }, '-=200')
+        .add({
+            targets: '#modal-caption',
+            opacity: [0, 1],
+            translateY: [10, 0],
+            duration: 600
+        }, '-=600');
       }
 
       function closeModal() {
-        modal.style.pointerEvents = "none";
-        anime({
-          targets: modal,
-          opacity: [1, 0],
-          duration: 300,
-          easing: "linear",
+        const tl = anime.timeline({
+            easing: 'easeInBack',
+            duration: 400,
+            complete: () => {
+                modalEl.style.pointerEvents = 'none';
+                setTimeout(() => { modalImg.src = ""; }, 100);
+            }
         });
-        anime({
-          targets: ".modal-content",
-          scale: [1, 0.5],
-          duration: 300,
-          easing: "easeInQuad",
+
+        tl
+        .add({
+            targets: modalContent,
+            scale: 0.8,
+            opacity: 0,
+            translateY: 50 // Rơi xuống khi đóng
+        })
+        .add({
+            targets: modalOverlay,
+            opacity: 0
+        }, '-=200');
+      }
+
+      // --- FLOATING HEARTS BACKGROUND ---
+      function createFloatingHearts() {
+        const container = document.getElementById('hearts-container');
+        const heartCount = isMobile ? 15 : 30;
+
+        for (let i = 0; i < heartCount; i++) {
+            const heart = document.createElement('div');
+            heart.classList.add('bg-heart', 'fas', 'fa-heart');
+            
+            const size = Math.random() * 20 + 10;
+            heart.style.fontSize = `${size}px`;
+            heart.style.left = `${Math.random() * 100}vw`;
+            heart.style.top = `${Math.random() * 100 + 100}vh`; 
+            
+            container.appendChild(heart);
+
+            anime({
+                targets: heart,
+                translateY: function() { return -1 * (Math.random() * 1000 + 800) },
+                translateX: function() { return anime.random(-50, 50); },
+                opacity: [
+                    { value: 0.6, duration: 100 },
+                    { value: 0, duration: 2000, delay: 3000 }
+                ],
+                rotate: function() { return anime.random(-45, 45); },
+                duration: function() { return anime.random(5000, 10000); },
+                delay: function() { return anime.random(0, 5000); },
+                loop: true,
+                easing: 'linear'
+            });
+        }
+      }
+      createFloatingHearts();
+
+      // --- TYPEWRITER & OTHER LOGIC (KEEP SAME) ---
+      function typeWriter(element, text, speed, callback, cursorElement) {
+        let i = 0;
+        element.textContent = "";
+        if (cursorElement) cursorElement.classList.remove("hidden");
+        function type() {
+          if (i < text.length) {
+            element.textContent += text.charAt(i);
+            i++;
+            setTimeout(type, speed);
+          } else {
+            if (callback) callback();
+          }
+        }
+        type();
+      }
+
+      function eraseText(element, callback, cursorElement) {
+        const text = element.textContent;
+        let i = text.length;
+        function erase() {
+          if (i > 0) {
+            element.textContent = text.substring(0, i - 1);
+            i--;
+            setTimeout(erase, 30);
+          } else {
+            if (callback) callback();
+          }
+        }
+        erase();
+      }
+
+      const titleText = "Happy 2 Months Anniversary";
+      const titleElement = document.querySelector("#typewriter-title .typewriter-text");
+      const titleCursor = document.querySelector("#typewriter-title .typewriter-cursor");
+      
+      const loveMessages = [
+        "Cảm ơn vì đã đến bên anh ❤️",
+        "Mỗi ngày bên em đều là một món quà 💕",
+        "Anh yêu em nhiều hơn em biết 🌹",
+        "Em là điều tuyệt vời nhất ✨"
+      ];
+      let msgIndex = 0;
+
+      typeWriter(titleElement, titleText, 100, () => {
+        setTimeout(() => {
+            titleCursor.classList.add('hidden');
+            startSubtitleLoop();
+        }, 1000);
+      }, titleCursor);
+
+      function startSubtitleLoop() {
+        const subEl = document.querySelector("#typewriter-subtitle .subtitle-text");
+        const subCur = document.querySelector("#typewriter-subtitle .typewriter-cursor");
+        
+        function loop() {
+            if(msgIndex >= loveMessages.length) msgIndex = 0;
+            const msg = loveMessages[msgIndex];
+            subCur.classList.remove('hidden');
+            typeWriter(subEl, msg, 80, () => {
+                setTimeout(() => {
+                    eraseText(subEl, () => {
+                        msgIndex++;
+                        loop();
+                    }, subCur);
+                }, 2000);
+            }, subCur);
+        }
+        loop();
+      }
+
+      const blob1 = document.getElementById("blob1");
+      const blob2 = document.getElementById("blob2");
+      const storySection = document.getElementById("story");
+      const storyCard = document.querySelector(".story-card");
+      const storyLines = document.querySelectorAll(".story-line");
+      const progressBar = document.getElementById("scroll-progress");
+
+      function handleScrollEffects() {
+        const scrollY = window.scrollY;
+        const windowHeight = window.innerHeight;
+        
+        const docHeight = document.body.scrollHeight - windowHeight;
+        if(docHeight > 0) {
+            const progress = (scrollY / docHeight) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+        
+        const factor = isMobile ? 0.05 : 0.2;
+        blob1.style.transform = `translate3d(0, ${scrollY * factor}px, 0)`;
+        blob2.style.transform = `translate3d(0, ${scrollY * -factor}px, 0)`;
+
+        if (storySection && storyCard) {
+            const rect = storySection.getBoundingClientRect();
+            let fraction = (windowHeight - rect.top) / (windowHeight + rect.height);
+            fraction = Math.max(0, Math.min(1, fraction));
+
+            if (!isMobile) {
+                let rotation, opacity, translateY;
+                if (fraction <= 0.5) {
+                    const progress = fraction * 2; 
+                    rotation = -90 + (90 * progress);
+                    opacity = progress;
+                    translateY = 50 * (1 - progress);
+                } else {
+                    const progress = (fraction - 0.5) * 2;
+                    rotation = 0 + (90 * progress);
+                    opacity = 1 - progress; 
+                    translateY = -50 * progress;
+                }
+                storyCard.style.transform = `rotateX(${rotation}deg) translate3d(0, ${translateY}px, 0)`;
+                storyCard.style.opacity = Math.min(1, opacity + 0.2); 
+            } else {
+                let opacityMobile = 0;
+                let translateMobile = 50;
+                if (fraction > 0.1 && fraction < 0.9) {
+                    opacityMobile = 1;
+                    translateMobile = 0;
+                }
+                storyCard.style.transition = "transform 0.5s ease-out, opacity 0.5s ease-out";
+                storyCard.style.opacity = opacityMobile;
+                storyCard.style.transform = `translate3d(0, ${translateMobile}px, 0)`;
+            }
+
+            storyLines.forEach((line, index) => {
+                const triggerPoint = 0.2 + (index * 0.05);
+                if (fraction > triggerPoint) {
+                    line.style.opacity = 1;
+                    line.style.transform = `translate3d(0, 0, 0)`;
+                    line.style.transition = "all 0.5s ease";
+                } else {
+                    line.style.opacity = 0;
+                    line.style.transform = `translate3d(0, 20px, 0)`;
+                }
+            });
+        }
+        rafId = null;
+      }
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                if(entry.target.id === "gallery") {
+                    anime({
+                        targets: '.gallery-title', opacity: [0,1], translateY: [-20,0], duration: 800, easing: 'easeOutQuad'
+                    });
+                    
+                    anime({
+                        targets: '.memory-card', 
+                        opacity: [0,1], 
+                        translateY: [50,0], 
+                        rotate: function() { return anime.random(-3, 3); }, 
+                        delay: anime.stagger(150), 
+                        easing: 'easeOutQuad',
+                        complete: function(anim) {
+                            document.querySelectorAll('.memory-card').forEach(card => {
+                                const currentRotation = card.style.transform.match(/rotate\(([^)]+)\)/);
+                                const rot = currentRotation ? currentRotation[1] : '0deg';
+                                card.style.setProperty('--r', rot);
+                                card.classList.add('animate-idle');
+                                card.style.transform = ''; 
+                            });
+                        }
+                    });
+                    observer.unobserve(entry.target);
+                }
+                if(entry.target.id === "counter") {
+                    const today = new Date();
+                    const diff = Math.ceil(Math.abs(today - startDate) / (1000 * 60 * 60 * 24));
+                    anime({
+                        targets: '#days-count', innerHTML: [0, diff], round: 1, duration: 2000, easing: 'easeOutExpo'
+                    });
+                    observer.unobserve(entry.target);
+                }
+                if(entry.target.id === "final") {
+                    anime({ targets: '.final-text', opacity: [0,1], translateY: [20,0], duration: 800 });
+                    anime({ targets: '#heart-btn', opacity: [0,1], scale: [0,1], delay: 300, duration: 1000 });
+                    anime({ targets: '.click-hint', opacity: [0,1], delay: 800, duration: 800 });
+                    observer.unobserve(entry.target);
+                }
+            }
+        });
+      }, { threshold: 0.15 });
+
+      document.querySelectorAll('#gallery, #counter, #final').forEach(sec => observer.observe(sec));
+
+      window.addEventListener('scroll', () => {
+        if (!rafId) {
+            rafId = requestAnimationFrame(handleScrollEffects);
+        }
+      }, { passive: true });
+      
+      handleScrollEffects();
+
+      if (!isMobile) {
+        const dot = document.querySelector(".cursor-dot");
+        const outline = document.querySelector(".cursor-outline");
+        window.addEventListener("mousemove", (e) => {
+            dot.style.left = e.clientX + "px"; dot.style.top = e.clientY + "px";
+            outline.animate({
+                left: `${e.clientX}px`,
+                top: `${e.clientY}px`
+            }, { duration: 500, fill: "forwards" });
         });
       }
 
-      // --- 4. CUSTOM CURSOR ---
-      const cursorDot = document.querySelector(".cursor-dot");
-      const cursorOutline = document.querySelector(".cursor-outline");
-      window.addEventListener("mousemove", (e) => {
-        const posX = e.clientX;
-        const posY = e.clientY;
-        cursorDot.style.left = `${posX}px`;
-        cursorDot.style.top = `${posY}px`;
-        cursorOutline.animate(
-          { left: `${posX}px`, top: `${posY}px` },
-          { duration: 500, fill: "forwards" }
-        );
-      });
-      const hoverables = document.querySelectorAll(
-        "button, .memory-card, .music-btn, .close-modal"
-      );
-      hoverables.forEach((el) => {
-        el.addEventListener("mouseenter", () => {
-          cursorOutline.style.transform = "translate(-50%, -50%) scale(1.5)";
-          cursorOutline.style.backgroundColor = "rgba(255, 77, 109, 0.1)";
-        });
-        el.addEventListener("mouseleave", () => {
-          cursorOutline.style.transform = "translate(-50%, -50%) scale(1)";
-          cursorOutline.style.backgroundColor = "transparent";
-        });
-      });
-
-      // --- 5. ANIMATIONS & SCROLL OBSERVER ---
-      // Hero Text
-      var textWrapper = document.querySelector(".ml11 .letters");
-      textWrapper.innerHTML = textWrapper.textContent.replace(
-        /([^\x00-\x80]|\w)/g,
-        "<span class='letter'>$&</span>"
-      );
-      anime
-        .timeline({ loop: false })
-        .add({
-          targets: ".ml11 .line",
-          scaleY: [0, 1],
-          opacity: [0.5, 1],
-          easing: "easeOutExpo",
-          duration: 700,
-        })
-        .add({
-          targets: ".ml11 .line",
-          translateX: [
-            0,
-            document.querySelector(".ml11 .letters").getBoundingClientRect()
-              .width + 10,
-          ],
-          easing: "easeOutExpo",
-          duration: 700,
-          delay: 100,
-        })
-        .add({
-          targets: ".ml11 .letter",
-          opacity: [0, 1],
-          translateY: [-30, 0],
-          scale: [0.5, 1],
-          easing: "easeOutElastic(1, .6)",
-          duration: 800,
-          offset: "-=775",
-          delay: (el, i) => 34 * (i + 1),
-        })
-        .add({
-          targets: ".subtitle",
-          opacity: [0, 1],
-          translateY: [20, 0],
-          easing: "easeOutExpo",
-          duration: 1000,
-        });
-
-      // Scroll Interactions
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              // --- STORY CARD: FLIP & STAGGER EFFECT (NEW) ---
-              if (entry.target.id === "story") {
-                // 1. Animate thẻ bài lật lên
-                anime({
-                  targets: ".story-card",
-                  opacity: [0, 1],
-                  rotateX: [20, 0], // Lật từ nghiêng sang thẳng
-                  translateY: [100, 0],
-                  duration: 1500,
-                  easing: "easeOutElastic(1, .6)",
-                });
-
-                // 2. Animate từng dòng chữ bên trong
-                anime({
-                  targets: ".story-line",
-                  opacity: [0, 1],
-                  translateY: [20, 0],
-                  delay: anime.stagger(300, { start: 500 }), // Dòng sau hiện chậm hơn dòng trước
-                  duration: 1000,
-                  easing: "easeOutExpo",
-                });
-
-                observer.unobserve(entry.target);
-              }
-
-              if (entry.target.id === "gallery") {
-                anime({
-                  targets: ".memory-card",
-                  translateY: [100, 0],
-                  opacity: [0, 1],
-                  rotate: function (el, i) {
-                    return i % 2 === 0 ? -3 : 3;
-                  },
-                  delay: anime.stagger(200),
-                  duration: 1200,
-                  easing: "easeOutExpo",
-                });
-                observer.unobserve(entry.target);
-              }
-              if (entry.target.id === "counter") {
-                const today = new Date();
-                const diffTime = Math.abs(today - startDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                anime({
-                  targets: "#days-count",
-                  innerHTML: [0, diffDays],
-                  round: 1,
-                  easing: "easeOutExpo",
-                  duration: 2500,
-                });
-                observer.unobserve(entry.target);
-              }
-            }
-          });
-        },
-        { threshold: 0.3 }
-      );
-      document
-        .querySelectorAll("section")
-        .forEach((sec) => observer.observe(sec));
-
-      // --- 6. HEART EXPLOSION & MUSIC ---
-      const heartBtn = document.getElementById("heart-btn");
-      heartBtn.addEventListener("click", (e) => {
-        const rect = heartBtn.getBoundingClientRect();
-        const x = rect.left + rect.width / 2;
-        const y = rect.top + rect.height / 2;
-        anime({
-          targets: "#heart-btn",
-          scale: [1, 2, 1],
-          duration: 500,
-          easing: "easeOutElastic(1, .5)",
-        });
-        for (let i = 0; i < 50; i++) {
-          const particle = document.createElement("div");
-          particle.classList.add("particle");
-          document.body.appendChild(particle);
-          const angle = Math.random() * Math.PI * 2;
-          const velocity = Math.random() * 200 + 100;
-          particle.style.left = x + "px";
-          particle.style.top = y + "px";
-          anime({
-            targets: particle,
-            translateX: Math.cos(angle) * velocity,
-            translateY: Math.sin(angle) * velocity,
-            opacity: [1, 0],
-            scale: [0, 2],
-            rotate: anime.random(0, 360),
-            duration: anime.random(1000, 2000),
-            easing: "easeOutExpo",
-            complete: () => particle.remove(),
-          });
-        }
-      });
-
-      const music = document.getElementById("bg-music");
-      const musicBtn = document.getElementById("music-toggle");
       let isPlaying = false;
       function toggleMusic() {
-        if (isPlaying) {
-          music.pause();
-          musicBtn.classList.remove("music-anim");
-          musicBtn.innerHTML = '<i class="fas fa-music"></i>';
-          musicBtn.style.opacity = "0.7";
-        } else {
-          music.play();
-          musicBtn.classList.add("music-anim");
-          musicBtn.innerHTML = '<i class="fas fa-compact-disc"></i>';
-          musicBtn.style.opacity = "1";
+        const audio = document.getElementById("bg-music");
+        const btn = document.getElementById("music-toggle");
+        if(isPlaying) { 
+            audio.pause(); 
+            btn.classList.remove("music-anim"); 
+        } else { 
+            audio.play().catch(e => console.log("Audio play failed interaction needed")); 
+            btn.classList.add("music-anim"); 
         }
         isPlaying = !isPlaying;
       }
+
+      document.getElementById("heart-btn").addEventListener("click", (e) => {
+        const rect = e.target.getBoundingClientRect();
+        const x = rect.left + rect.width/2;
+        const y = rect.top + rect.height/2;
+        
+        anime({ targets: '#heart-btn', scale: [1, 1.4, 1], duration: 300, easing: 'easeInOutQuad' });
+
+        const count = isMobile ? 15 : 30; 
+        for(let i=0; i<count; i++) {
+            const p = document.createElement("div");
+            p.className = "particle";
+            p.style.left = x + "px"; p.style.top = y + "px";
+            document.body.appendChild(p);
+            
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = Math.random() * 100 + 50;
+            
+            anime({
+                targets: p,
+                translateX: Math.cos(angle) * velocity,
+                translateY: Math.sin(angle) * velocity,
+                opacity: [1, 0],
+                scale: [0, 1.5],
+                duration: Math.random() * 800 + 600,
+                easing: 'easeOutExpo',
+                complete: () => p.remove()
+            });
+        }
+      });
     </script>
   </body>
 </html>
