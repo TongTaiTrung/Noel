@@ -6,1031 +6,173 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>2 Months of Us | Forever Together</title>
+    <title>2-month anniversary</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="./style.css">
     <link
-      href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@300;400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
       rel="stylesheet"
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-
-    <style>
-      :root {
-        --bg-color: #ffe6e9;
-        --primary-color: #ff8fa3;
-        --accent-color: #ff4d6d;
-        --accent-color-scrollpill:rgba(255, 143, 164, 0.46);
-        --text-color: #594a4e;
-        --card-bg: rgba(255, 255, 255, 0.75);
-        --font-heading: "Dancing Script", cursive;
-        --font-body: "Quicksand", sans-serif;
-      }
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
-      }
-
-      html, body {
-        width: 100%;
-        overflow-x: hidden;
-        overscroll-behavior-y: none;
-      }
-
-      body {
-        background: linear-gradient(-45deg, #fff0f3, #ffe6e9, #fff0f5, #ffd1dc);
-        background-size: 400% 400%;
-        animation: gradientBG 15s ease infinite;
-        font-family: var(--font-body);
-        color: var(--text-color);
-        user-select: none;
-        -webkit-overflow-scrolling: touch;
-        touch-action: pan-y;
-      }
-
-      @keyframes gradientBG {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-      }
-
-      /* --- SCROLL PROGRESS --- */
-      .scroll-progress {
-        position: fixed; top: 0; left: 0; height: 4px;
-        background: linear-gradient(to right, var(--primary-color), var(--accent-color));
-        width: 0%; z-index: 100001;
-        box-shadow: 0 0 10px rgba(255, 77, 109, 0.5);
-        will-change: width;
-        transition: width 0.1s linear;
-      }
-
-      /* --- BACKGROUND ELEMENTS --- */
-      .background-container {
-        position: fixed; inset: 0; z-index: -2; overflow: hidden; pointer-events: none;
-      }
-      .blob {
-        position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; 
-        will-change: transform;
-      }
-      
-      .bg-heart {
-        position: absolute; color: var(--primary-color); opacity: 0; z-index: -1; filter: blur(1px);
-        will-change: transform, opacity;
-      }
-
-      /* --- CURSOR (PC Only) --- */
-      @media (pointer: fine) {
-        * { cursor: none !important; }
-        .cursor-dot, .cursor-outline {
-          position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
-          border-radius: 50%; z-index: 1000000000; pointer-events: none; will-change: transform;
-        }
-        .cursor-dot { width: 8px; height: 8px; background-color: var(--accent-color); }
-        .cursor-outline {
-          width: 40px; height: 40px; border: 2px solid var(--primary-color);
-          transition: width 0.3s, height 0.3s, background 0.3s;
-        }
-      }
-      @media (pointer: coarse) {
-        .cursor-dot, .cursor-outline { display: none; }
-      }
-
-      section {
-        min-height: 100vh; display: flex; flex-direction: column;
-        justify-content: center; align-items: center; padding: 2rem 1rem; position: relative;
-      }
-
-      /* --- HERO SECTION --- */
-      .ml11 {
-        font-family: var(--font-heading); 
-        font-size: clamp(3rem, 9vw, 5.5rem); 
-        color: var(--accent-color); 
-        text-align: center;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        line-height: 1.2;
-        margin-bottom: 0.5rem;
-      }
-
-      .ml11 .text-wrapper {
-        position: relative; display: inline-block; padding-top: 0.1em; padding-right: 0.05em; padding-bottom: 0.15em;
-        overflow: hidden; 
-      }
-      .ml11 .letter {
-        display: inline-block; line-height: 1em; transform-origin: 0 100%;
-      }
-
-      .subtitle {
-        font-size: clamp(1rem, 4vw, 1.3rem); margin-top: 10px; font-weight: 600;
-        background: linear-gradient(45deg, #ff8fa3, #ff4d6d);
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        text-align: center; min-height: 1.5em; opacity: 0;
-        padding: 0 10px;
-      }
-
-      /* --- SVG GLOW --- */
-      .svg-container {
-        width: clamp(120px, 30vw, 180px); height: clamp(120px, 30vw, 180px); margin-bottom: 20px;
-        filter: drop-shadow(0 0 15px rgba(255, 77, 109, 0.6)); 
-        will-change: filter;
-      }
-      .heart-path {
-        stroke: var(--accent-color); stroke-width: 4; stroke-linecap: round;
-        opacity: 0.4; stroke-linejoin: round; fill-opacity: 0; 
-      }
-
-      /* --- SCROLL INDICATOR --- */
-      .scroll-wrapper {
-        margin-top: 40px; display: flex; flex-direction: column; align-items: center; cursor: pointer;
-      }
-      .scroll-pill {
-        width: 26px; height: 45px; border: 2px solid var(--accent-color-scrollpill);
-        border-radius: 15px; position: relative; display: flex; justify-content: center;
-      }
-      .scroll-dot {
-        width: 4px; height: 4px; background: var(--accent-color); border-radius: 50%;
-        margin-top: 8px; animation: scroll-drop 1.5s cubic-bezier(0.77, 0, 0.175, 1) infinite;
-      }
-      .scroll-arrow {
-        margin-top: 8px; color: var(--accent-color); font-size: 1rem;
-        animation: arrow-bounce 1.5s ease-in-out infinite;
-      }
-      @keyframes scroll-drop { 0% { transform: translateY(0); opacity: 1; } 80% { transform: translateY(15px); opacity: 0; } 100% { transform: translateY(0); opacity: 0; } }
-      @keyframes arrow-bounce { 0%, 100% { transform: translateY(0); opacity: 0.6; } 50% { transform: translateY(5px); opacity: 1; } }
-
-      /* --- STORY CARD (FIXED FLIP FOR MOBILE) --- */
-      .story-section { perspective: 1500px; }
-      .story-card {
-        background: rgba(255, 255, 255, 0.85);
-        padding: clamp(1.5rem, 5vw, 4rem); border-radius: 30px;
-        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-        box-shadow: 0 20px 50px rgba(255, 182, 193, 0.4), inset 0 0 20px rgba(255,255,255,0.8);
-        border: 2px solid #fff;
-        max-width: 800px; width: 100%;
-        
-        transform-style: preserve-3d;
-        transform-origin: center top; 
-        will-change: transform, opacity;
-        
-        opacity: 0;
-        transform: rotateX(-90deg);
-        transition: none !important;
-      }
-      
-      @media (max-width: 768px) {
-          .story-card {
-              transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 1s ease !important;
-              transform: rotateX(-90deg) translateY(50px);
-              opacity: 0;
-          }
-          .story-card.mobile-active {
-              transform: rotateX(0deg) translateY(0);
-              opacity: 1;
-          }
-      }
-      @media (min-width: 769px) {
-        .story-card { transform: rotateX(-90deg); }
-      }
-      
-      .story-line {
-        display: block; margin-bottom: 15px; font-size: clamp(1.1rem, 3vw, 1.3rem);
-        opacity: 0; transform: translateY(20px);
-        will-change: transform, opacity;
-        transition: none !important;
-      }
-      @media (max-width: 768px) {
-          .story-line { transition: opacity 0.5s ease, transform 0.5s ease !important; }
-          .story-card.mobile-active .story-line { opacity: 1; transform: translateY(0); }
-      }
-
-      /* --- GALLERY (CERAMIC STYLE) --- */
-      .memory-section { padding-top: 3rem; padding-bottom: 3rem; }
-      .gallery-title {
-        font-family: 'Dancing Script'; font-size: clamp(2.5rem, 8vw, 3.5rem); 
-        color: #ff4d6d; margin-bottom: 2rem; opacity: 0; text-align: center;
-        text-shadow: 2px 2px 0px #fff;
-      }
-      .gallery-title .letter { display: inline-block; } 
-
-      .gallery-grid {
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1.5rem; width: 100%; max-width: 1200px; padding: 0 10px;
-      }
-      @media (min-width: 600px) {
-        .gallery-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2.5rem; }
-      }
-      @media (max-width: 599px) {
-        .gallery-grid { grid-template-columns: 1fr; gap: 2.5rem; }
-      }
-
-      .memory-card {
-        background: #fff;
-        border-radius: 24px;
-        overflow: hidden; 
-        box-shadow: 
-            0 10px 20px rgba(0,0,0,0.05), 
-            0 2px 5px rgba(0,0,0,0.05);
-        opacity: 0; cursor: pointer; 
-        position: relative; will-change: transform;
-        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
-      }
-      
-      .memory-card::after {
-          content: ''; position: absolute; inset: 0;
-          background: linear-gradient(to top, rgba(255, 77, 109, 0.1), transparent);
-          opacity: 0; transition: opacity 0.3s ease;
-          pointer-events: none;
-      }
-
-      .memory-card:hover {
-          transform: translateY(-8px) scale(1.02);
-          box-shadow: 0 20px 40px rgba(255, 77, 109, 0.25);
-          z-index: 10;
-      }
-      .memory-card:hover::after { opacity: 1; }
-
-      .card-image-wrapper {
-          width: 100%; height: 200px; overflow: hidden;
-      }
-      @media (min-width: 600px) { .card-image-wrapper { height: 320px; } }
-
-      .card-image {
-        width: 100%; height: 100%; object-fit: cover;
-        transition: transform 0.8s ease;
-        background: #fff0f5;
-      }
-      .memory-card:hover .card-image { transform: scale(1.1); }
-
-      .caption-container {
-          padding: 15px 10px; text-align: center;
-          background: #fff;
-      }
-      .caption-text {
-        font-family: "Dancing Script", cursive;
-        font-size: 1.4rem; color: #594a4e;
-        margin: 0;
-      }
-      @media (min-width: 600px) { .caption-text { font-size: 1.6rem; } }
-
-      /* --- SOFT BUBBLE TIMER (ROUND & SOFT) --- */
-      .counter-container {
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        width: 100%; max-width: 800px;
-      }
-      .counter-title {
-        font-family: var(--font-heading); font-size: clamp(2rem, 6vw, 3rem); color: var(--accent-color);
-        margin-bottom: 2rem; text-align: center; opacity: 0; text-shadow: 2px 2px 0 #fff;
-      }
-      
-      .timer-wrapper {
-        display: flex; align-items: center; justify-content: center;
-        gap: 1rem; flex-wrap: wrap; 
-        
-        /* Transparent container for bubbles */
-        background: transparent;
-        box-shadow: none; border: none;
-        
-        opacity: 0;
-        transform: rotateX(-90deg);
-        transform-style: preserve-3d;
-        transition: none; /* Handled by JS */
-        
-        width: 100%; padding: 0 10px;
-      }
-      
-      /* Mobile Transition for Timer */
-      @media (max-width: 768px) {
-          .timer-wrapper {
-              transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 1s ease !important;
-          }
-          .timer-wrapper.mobile-active {
-              transform: rotateX(0deg) translateY(0);
-              opacity: 1;
-          }
-      }
-
-      /* BUBBLE STYLE */
-      .time-box {
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        /* Perfect Circle */
-        width: clamp(75px, 18vw, 110px);
-        height: clamp(75px, 18vw, 110px);
-        border-radius: 50%;
-        
-        /* Soft Pearlescent Look */
-        background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95), rgba(255, 240, 245, 0.8));
-        backdrop-filter: blur(5px);
-        
-        /* Soft glow shadow + Inset volume */
-        box-shadow: 
-            0 10px 25px rgba(255, 77, 109, 0.25),
-            inset 0 -5px 15px rgba(255, 77, 109, 0.1),
-            inset 0 5px 10px rgba(255, 255, 255, 1);
-            
-        border: 1px solid rgba(255,255,255,0.6);
-        position: relative; z-index: 2;
-        
-        /* Breathing animation */
-        animation: breathe 3s ease-in-out infinite;
-      }
-      
-      .time-box:nth-child(1) { animation-delay: 0s; }
-      .time-box:nth-child(3) { animation-delay: 0.5s; }
-      .time-box:nth-child(5) { animation-delay: 1s; }
-      .time-box:nth-child(7) { animation-delay: 1.5s; }
-
-      @keyframes breathe {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.05); }
-      }
-
-      .time-value {
-        font-size: clamp(1.8rem, 6vw, 3rem); font-weight: 700; color: var(--accent-color);
-        line-height: 1; margin-bottom: 2px;
-        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
-      }
-      .time-label {
-        font-family: 'Dancing Script', cursive; font-size: clamp(1rem, 3vw, 1.4rem); color: #888;
-      }
-      
-      .timer-divider {
-        font-size: 1.5rem; color: var(--primary-color);
-        display: flex; align-items: center; justify-content: center;
-        opacity: 0.6;
-      }
-
-      /* --- FINAL --- */
-      .heart-btn {
-        font-size: clamp(4rem, 10vw, 6rem); background: none; border: none;
-        animation: heartbeat 1.5s infinite; cursor: pointer; z-index: 100;
-        position: relative;
-      }
-
-      /* --- MODAL (Cinematic Style) --- */
-      .modal {
-        position: fixed; inset: 0; display: flex; justify-content: center;
-        align-items: center; z-index: 100002; 
-        visibility: hidden; opacity: 0; pointer-events: none; 
-      }
-      .modal.active { visibility: visible; opacity: 1; pointer-events: auto; }
-
-      .modal-overlay {
-        position: absolute; inset: 0; background: rgba(0, 0, 0, 0.9); 
-        backdrop-filter: blur(10px);
-        opacity: 0;
-      }
-      
-      .modal-content {
-        position: relative; 
-        width: 100%; max-width: 600px;
-        margin: 0 15px;
-        border-radius: 20px;
-        overflow: hidden; 
-        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
-        transform-origin: center center; opacity: 0;
-        background: transparent; padding: 0;
-        display: flex; flex-direction: column; max-height: 85vh;
-      }
-      
-      .modal-inner {
-        position: relative; width: 100%; height: 100%;
-        background: #000;
-        display: flex; justify-content: center; align-items: center;
-      }
-      
-      #modal-img {
-        width: 100%; height: 100%; max-height: 80vh; object-fit: cover; display: block;
-      }
-
-      .modal-caption-container {
-        position: absolute; bottom: 0; left: 0; width: 100%;
-        padding: 40px 20px 25px 20px;
-        background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0) 100%);
-        color: white; text-align: center; z-index: 2; pointer-events: none;
-      }
-
-      #modal-caption {
-        font-family: 'Dancing Script', cursive; color: #fff; 
-        font-size: clamp(1.6rem, 5vw, 2.5rem); line-height: 1.2;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-        word-wrap: break-word; display: inline; 
-      }
-      
-      .modal-cursor {
-        display: inline-block; width: 2px; height: 1.2em;
-        background-color: #fff; margin-left: 2px;
-        animation: blink 1s step-end infinite; vertical-align: middle;
-        box-shadow: 0 0 5px rgba(255,255,255,0.8);
-      }
-      
-      .close-modal {
-        position: absolute; top: 15px; right: 15px; width: 40px; height: 40px;
-        background: rgba(255, 255, 255, 0.2); 
-        backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-        color: white; border-radius: 50%;
-        display: flex; justify-content: center; align-items: center;
-        cursor: pointer; 
-        font-size: 1.2rem; z-index: 10; 
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        transition: transform 0.3s, background 0.3s;
-      }
-      .close-modal:hover { transform: rotate(90deg) scale(1.1); background: rgba(255, 77, 109, 0.8); }
-
-      /* --- SPARK & PARTICLE --- */
-      .spark {
-        position: fixed; width: 4px; height: 4px; border-radius: 50%;
-        pointer-events: none; z-index: 999999;
-      }
-      .particle {
-        position: fixed; pointer-events: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff4d6d'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E");
-        background-size: contain; width: 25px; height: 25px; z-index: 10000; will-change: transform;
-      }
-
-      @media (max-width: 768px) {
-        .background-container .blob { filter: blur(50px); opacity: 0.4; } 
-        .caption-text { font-size: 1.5rem; }
-      }
-    </style>
   </head>
   <body>
-    <div class="scroll-progress" id="scroll-progress"></div>
-    <div class="cursor-dot"></div>
-    <div class="cursor-outline"></div>
+    <canvas id="gradient-canvas"></canvas>
+    <div class="noise"></div>
+    <audio id="bg-music" loop>
+      <source
+        src="https://www.bensound.com/bensound-music/bensound-tenderness.mp3"
+        type="audio/mpeg"
+      />
+    </audio>
 
-    <div class="background-container" id="bg-container">
-      <div class="blob" id="blob1" style="background: #ffc2d1; width: 40vw; height: 40vw; top: 5%; left: -10%;"></div>
-      <div class="blob" id="blob2" style="background: #ffe5ec; width: 50vw; height: 50vw; top: 40%; right: -15%;"></div>
-      <div class="blob" id="blob3" style="background: #ffccd5; width: 35vw; height: 35vw; bottom: 0%; left: 15%;"></div>
-      <div id="hearts-container"></div>
-    </div>
-
-    <section class="hero-section">
-      <div class="svg-container">
-        <svg viewBox="0 0 100 100">
-            <defs>
-                <radialGradient id="heart-glow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                    <stop offset="0%" style="stop-color:#fff0f3; stop-opacity:0.9" />
-                    <stop offset="60%" style="stop-color:#ff4d6d; stop-opacity:0.5" />
-                    <stop offset="100%" style="stop-color:#ff4d6d; stop-opacity:0.1" />
-                </radialGradient>
-            </defs>
-            <path class="heart-path" fill="url(#heart-glow)" d="M50 88.9L48.5 87.6C20.4 62.1 2 45.5 2 25.1C2 8.5 14.9 2 29.8 2C38.2 2 46.3 5.9 50 12.1C53.7 5.9 61.8 2 70.2 2C85.1 2 98 8.5 98 25.1C98 45.5 79.6 62.1 51.5 87.6L50 88.9Z" />
-        </svg>
-      </div>
-
-      <h1 class="ml11">
-        <span class="text-wrapper">
-          <span class="letters" id="anime-title">2 months of loving</span>
-        </span>
-      </h1>
-      
-      <p class="subtitle" id="typewriter-subtitle">
-        <span class="subtitle-text"></span>
-      </p>
-      
-      <div class="scroll-wrapper">
-          <div class="scroll-pill">
-              <div class="scroll-dot"></div>
+    <div id="smooth-wrapper">
+      <div id="smooth-content">
+        
+        <section>
+          <div class="hero-wrapper">
+            <h1 class="hero-title">2 Months</h1>
+            <p class="hero-sub">... of loving ...</p>
           </div>
-          <div class="scroll-arrow">
-              <i class="fas fa-chevron-down"></i>
+          <div
+            style="
+              position: absolute;
+              bottom: 40px;
+              opacity: 0.5;
+              animation: float 3s ease-in-out infinite;
+            "
+          >
+            <i class="fas fa-chevron-down" style="font-size: 1rem;"></i>
           </div>
-      </div>
-    </section>
+        </section>
 
-    <section class="story-section" id="story">
-      <div class="story-card">
-        <h2 style="text-align: center; margin-bottom: 20px; font-family: var(--font-heading); font-size: 2.5rem; color: var(--accent-color);">Câu chuyện nhỏ</h2>
-        <div class="story-content">
-          <span class="story-line">Hai tháng trôi qua thật nhanh,</span>
-          <span class="story-line">nhưng cũng đủ để chúng ta có những kỷ niệm thật đẹp.</span>
-          <span class="story-line">Từ những dòng tin nhắn đầu tiên,</span>
-          <span class="story-line">những buổi hẹn hò ngại ngùng cho đến lúc này.</span>
-          <span class="story-line">Mỗi ngày trôi qua, anh lại thấy yêu em nhiều hơn.</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="memory-section" id="gallery">
-      <h2 class="gallery-title">Khoảnh khắc của chúng ta</h2>
-      <div class="gallery-grid" id="gallery-grid"></div>
-    </section>
-
-    <section class="counter-section" id="counter">
-      <div class="counter-container">
-        <h3 class="counter-title">Chúng ta đã bên nhau</h3>
-        <div class="timer-wrapper">
-            <div class="time-box">
-                <span class="time-value" id="days-count">0</span>
-                <span class="time-label">Ngày</span>
+        <section>
+          <div class="story-container">
+            <div class="glass-card reveal-card">
+              <span class="story-date">The Beginning</span>
+              <p class="story-p">
+                Mọi thứ bắt đầu khá đơn giản. Không ồn ào, không đặc biệt, chỉ là
+                hai người vô tình bước vào cùng một câu chuyện.
+              </p>
             </div>
-            
-            <div class="timer-divider"><i class="fas fa-heart"></i></div>
 
-            <div class="time-box">
-                <span class="time-value" id="hours-count">00</span>
-                <span class="time-label">Giờ</span>
+            <div
+              class="glass-card reveal-card"
+              style="align-self: flex-end; text-align: right"
+            >
+              <span class="story-date">The Spark</span>
+              <p class="story-p">
+                Buổi gặp hôm đó không quá dài, nhưng đủ để anh nhận ra mình muốn gặp
+                em thêm nhiều lần nữa.
+              </p>
             </div>
-            
-            <div class="timer-divider"><i class="fas fa-heart" style="font-size: 1rem; opacity:0.6"></i></div>
 
-            <div class="time-box">
-                <span class="time-value" id="minutes-count">00</span>
-                <span class="time-label">Phút</span>
+            <div class="glass-card reveal-card">
+              <span class="story-date">The Feeling</span>
+              <p class="story-p">
+                Ở cạnh em, mọi thứ trở nên dễ chịu hơn. Không cần cố gắng, chỉ cần
+                là chính mình.
+              </p>
             </div>
-        </div>
-      </div>
-    </section>
+          </div>
+        </section>
 
-    <section id="final">
-      <p class="final-text" style="font-size: 1.8rem; margin-bottom: 20px; font-weight: 700; font-family: var(--font-heading); opacity: 0; text-align: center;">
-        Yêu em mãi mãi!
-      </p>
-      <button id="heart-btn" class="heart-btn" style="opacity: 0">
-        <i class="fas fa-heart" style="color: #ff4d6d"></i>
-      </button>
-    </section>
+        <section class="counter-section">
+          <div class="circle-deco"></div>
+          <div class="monument-wrapper">
+            <span class="days-number" id="days-counter">0</span>
+            <span class="days-label">Days Together</span>
+          </div>
+        </section>
 
-    <div class="modal" id="image-modal">
-      <div class="modal-overlay" onclick="closeModal()"></div>
-      <div class="modal-content">
-        <div class="close-modal" onclick="closeModal()"><i class="fas fa-times"></i></div>
-        <div class="modal-inner">
-            <img src="" id="modal-img" alt="Memory Detail"/>
-            <div class="modal-caption-container">
-                <span id="modal-caption"></span><span class="modal-cursor"></span>
-            </div>
-        </div>
-      </div>
-    </div>
+        <section class="gallery-section">
+          <div class="gallery-header">
+            <h2>Moments</h2>
+          </div>
+          <div class="gallery-wrapper">
+            <div class="col col-left"></div>
+            <div class="col col-right"></div>
+          </div>
+        </section>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-
-    <script>
-      // CONFIGURATION & VARIABLES
-      const startDate = new Date(2025, 9, 22, 7, 40, 0); 
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-      let rafId = null;
-
-      // Memories Data
-      const memories = [
-        { id: 1, img: "/textures/img7.jpg", caption: "Tấm hình kỷ niệm đầu tiên của hai mình.", date: "21/10/2025" },
-        { id: 2, img: "/textures/img1.jpg", caption: "Những ngày khi chúng ta còn bỡ ngỡ khi bắt chuyện với nhau.", date: "22/10/2025" },
-        { id: 3, img: "/textures/img6.jpg", caption: "Lúc ra về nhưng lại không muốn rời xa em.", date: "25/10/2025" },
-        { id: 4, img: "/textures/img4.jpg", caption: "Buổi đi chơi giống như hẹn hò vậy, anh cứ nhớ mãi.", date: "14/11/2025" },
-        { id: 5, img: "/textures/img8.jpg", caption: "Món quà em tặng anh nhân ngày International Men's Day.", date: "19/11/2025" },
-        { id: 6, img: "/textures/img9.png", caption: "Em lại đến bên anh với một bất ngờ. Có lẽ trước đó anh đã không nói, nhưng món quà của em khiến anh xúc động rất nhiều!", date: "19/11/2025" },
-        { id: 7, img: "/textures/img2.jpg", caption: "Mỗi giây phút bên em, đối với anh đó đều là những món quà.", date: "20/11/2025" },
-      ];
-
-      // --- INITIALIZATION ---
-      const galleryGrid = document.getElementById("gallery-grid");
-      galleryGrid.innerHTML = memories.map((m) => {
-            const safeCaption = m.caption.replace(/'/g, "\\'");
-            return `
-            <div class="memory-card" onclick="openModal('${m.img}', '${safeCaption}')">
-              <div class="card-image-wrapper">
-                <img src="${m.img}" class="card-image" alt="Memory" loading="lazy">
+        <section style="margin-bottom: 50px;">
+          <div
+            class="envelope-container"
+            onclick="this.querySelector('.env-card').classList.toggle('open')"
+          >
+            <div class="env-card">
+              <div class="env-content">
+                <i
+                  class="fas fa-heart"
+                  style="
+                    font-size: 2rem;
+                    color: var(--primary);
+                    margin-bottom: 10px;
+                  "
+                ></i>
+                <p style="letter-spacing: 2px; font-size: 0.8rem">OPEN ME</p>
               </div>
-              <div class="caption-container">
-                <div class="caption-text">${m.date}</div>
+              <div class="hidden-letter">
+                <p>Yêu em nhìu nhìu :></p>
+                <button
+                  onclick="fireConfetti(event)"
+                  style="
+                    margin-top: 15px;
+                    padding: 8px 25px;
+                    border-radius: 50px;
+                    background: var(--primary);
+                    color: white;
+                    border: none;
+                    font-family: var(--font-sans);
+                    font-weight: 500;
+                  "
+                >
+                  <i class="fa-solid fa-heart"></i>
+                </button>
               </div>
             </div>
-          `;
-        }).join("");
+          </div>
+          <p style="margin-top: 50px; font-size: 0.8rem; opacity: 0.5">
+            Forever & Always
+          </p>
+        </section>
 
-      // --- HELPER: Wrap letters for Anime.js ---
-      function wrapText(element) {
-          element.innerHTML = element.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
-      }
+      </div>
+    </div>
 
-      // --- HERO ANIMATIONS ---
-      const heartPath = document.querySelector('.heart-path');
-      heartPath.style.fillOpacity = 0;
+    <div class="modal" id="modal">
+      <div class="modal-card">
+        <div class="modal-image-area">
+          <img id="modal-img" src="" alt="Memory" />
+        </div>
+        <div class="modal-info-area">
+          <div class="modal-close" onclick="closeModal()">
+            <i class="fas fa-times"></i>
+          </div>
 
-      const heartAnim = anime.timeline({loop: true, direction: 'alternate'});
-      heartAnim
-        .add({
-          targets: '.heart-path',
-          strokeDashoffset: [anime.setDashoffset, 0],
-          easing: 'easeInOutSine',
-          duration: 2000,
-          delay: 500
-        })
-        .add({
-          targets: '.heart-path',
-          fillOpacity: [0, 1], 
-          duration: 1000,
-          easing: 'linear'
-        }, '-=1000');
+          <div class="info-top">
+            <h4 id="modal-date">DATE</h4>
+            <h2 id="modal-title">Caption</h2>
+            <p class="info-desc" id="info-desc">
+              Một khoảnh khắc được lưu giữ lại trong dòng thời gian của chúng
+              ta.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      // --- ROLLING TEXT EFFECT ---
-      var textWrapper = document.querySelector('.ml11 .letters');
-      textWrapper.innerHTML = textWrapper.textContent.replace(/([^\x00-\x80]|\w)/g, "<span class='letter'>$&</span>");
-
-      anime.timeline({loop: false})
-        .add({
-          targets: '.ml11 .letter',
-          translateY: ["100%",0],
-          translateZ: 0,
-          rotateX: [90, 0],
-          opacity: [0,1],
-          easing: "easeOutExpo",
-          duration: 1400,
-          delay: (el, i) => 300 + 40 * i 
-        });
-
-      // 3. Subtitle Fade
-      const loveMessages = [
-        "Cảm ơn vì đã đến bên anh ❤️",
-        "Mỗi ngày bên em đều là một món quà 💕",
-        "Anh yêu em nhiều hơn em biết 🌹",
-        "Em là điều tuyệt vời nhất ✨"
-      ];
-      let msgIndex = 0;
-      
-      function animateSubtitle() {
-          const subEl = document.querySelector(".subtitle");
-          const subTextEl = document.querySelector(".subtitle-text");
-          subTextEl.innerText = loveMessages[msgIndex];
-          
-          anime.timeline()
-            .add({
-                targets: subEl,
-                opacity: [0, 1],
-                translateY: [20, 0],
-                duration: 1000,
-                easing: "easeOutQuad"
-            })
-            .add({
-                targets: subEl,
-                opacity: 0,
-                translateY: -20,
-                duration: 800,
-                easing: "easeInQuad",
-                delay: 2000,
-                complete: () => {
-                    msgIndex = (msgIndex + 1) % loveMessages.length;
-                    animateSubtitle();
-                }
-            });
-      }
-      setTimeout(animateSubtitle, 2000); 
-
-      // --- SPARK EFFECT (WAAPI) ---
-      function createTyperSpark(element) {
-        if (!element) return;
-        const rect = element.getBoundingClientRect();
-        const x = rect.left + rect.width / 2;
-        const y = rect.top + rect.height / 2;
-
-        for (let i = 0; i < 2; i++) {
-            const spark = document.createElement('div');
-            spark.classList.add('spark');
-            spark.style.left = x + 'px';
-            spark.style.top = y + 'px';
-            spark.style.backgroundColor = isMobile ? '#ff4d6d' : (i % 2 === 0 ? '#ffeb3b' : '#ff4d6d'); 
-            document.body.appendChild(spark);
-
-            const animation = spark.animate([
-                { transform: 'translate(0, 0) scale(1)', opacity: 1 },
-                { transform: `translate(${anime.random(-15, 15)}px, ${anime.random(-15, 15)}px) scale(0)`, opacity: 0 }
-            ], {
-                duration: anime.random(300, 500),
-                easing: 'cubic-bezier(0.19, 1, 0.22, 1)', 
-            });
-
-            animation.onfinish = () => spark.remove();
-        }
-      }
-
-      // --- MODAL LOGIC (FIXED WITH WAAPI) ---
-      const modalEl = document.getElementById('image-modal');
-      const modalOverlay = document.querySelector('.modal-overlay');
-      const modalContent = document.querySelector('.modal-content');
-      const modalImg = document.getElementById('modal-img');
-      const modalCaption = document.getElementById('modal-caption');
-      
-      let typeInterval; 
-      let isModalAnimating = false; 
-
-      function openModal(imgSrc, captionText) {
-        if (isModalAnimating) return;
-        isModalAnimating = true;
-
-        modalImg.src = imgSrc;
-        modalCaption.innerText = ""; 
-        
-        modalEl.classList.add('active'); 
-        
-        // Reset styles for animation start
-        modalOverlay.style.opacity = 0;
-        modalContent.style.opacity = 0;
-
-        const overlayAnim = modalOverlay.animate([
-            { opacity: 0 }, { opacity: 1 }
-        ], { duration: 400, easing: 'ease-out', fill: 'forwards' });
-
-        const randomRotate = Math.random() * 8 - 4; 
-        const contentAnim = modalContent.animate([
-            { opacity: 0, transform: `scale(0.8) rotate(${randomRotate*2}deg)` },
-            { opacity: 1, transform: `scale(1) rotate(0deg)` }
-        ], { duration: 600, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)', fill: 'forwards' }); 
-
-        Promise.all([overlayAnim.finished, contentAnim.finished]).then(() => {
-            isModalAnimating = false;
-        });
-
-        clearInterval(typeInterval);
-        
-        setTimeout(() => {
-            let i = 0;
-            typeInterval = setInterval(() => {
-                if (i < captionText.length) {
-                    modalCaption.textContent += captionText.charAt(i);
-                    i++;
-                    const cursor = document.querySelector('.modal-cursor');
-                    createTyperSpark(cursor);
-                } else {
-                    clearInterval(typeInterval);
-                }
-            }, 30);
-        }, 500);
-      }
-
-      function closeModal() {
-        if (isModalAnimating) return;
-        clearInterval(typeInterval);
-        isModalAnimating = true;
-
-        const overlayAnim = modalOverlay.animate([
-            { opacity: 1 }, { opacity: 0 }
-        ], { duration: 300, easing: 'ease-in', fill: 'forwards' });
-
-        const contentAnim = modalContent.animate([
-            { opacity: 1, transform: 'scale(1)' },
-            { opacity: 0, transform: 'scale(0.8)' }
-        ], { duration: 300, easing: 'ease-in', fill: 'forwards' });
-
-        Promise.all([overlayAnim.finished, contentAnim.finished]).then(() => {
-            modalEl.classList.remove('active'); 
-            modalImg.src = ""; 
-            isModalAnimating = false;
-        });
-        
-        // Safety cleanup
-        setTimeout(() => {
-             if(modalEl.classList.contains('active') && isModalAnimating) {
-                modalEl.classList.remove('active');
-                isModalAnimating = false;
-             }
-        }, 350);
-      }
-
-      // --- FLOATING HEARTS (WAAPI) ---
-      function createFloatingHearts() {
-        const container = document.getElementById('hearts-container');
-        const heartCount = isMobile ? 8 : 30; 
-        for (let i = 0; i < heartCount; i++) {
-            const heart = document.createElement('div');
-            heart.classList.add('bg-heart', 'fas', 'fa-heart');
-            const size = Math.random() * 20 + 10;
-            heart.style.fontSize = `${size}px`;
-            heart.style.left = `${Math.random() * 100}vw`;
-            heart.style.top = `${Math.random() * 100 + 100}vh`; 
-            container.appendChild(heart);
-            
-            const duration = Math.random() * 5000 + 5000;
-            const delay = Math.random() * 5000;
-            
-            heart.animate([
-                { transform: `translateY(0) rotate(${Math.random() * -45}deg)`, opacity: 0.6 },
-                { transform: `translateY(${-1 * (Math.random() * 1000 + 800)}px) rotate(${Math.random() * 45}deg)`, opacity: 0 }
-            ], {
-                duration: duration,
-                delay: delay,
-                iterations: Infinity,
-                easing: 'linear'
-            });
-        }
-      }
-      createFloatingHearts();
-
-      // --- SCROLL EFFECTS ---
-      const blob1 = document.getElementById("blob1");
-      const blob2 = document.getElementById("blob2");
-      const storySection = document.getElementById("story");
-      const storyCard = document.querySelector(".story-card");
-      const storyLines = document.querySelectorAll(".story-line");
-      const progressBar = document.getElementById("scroll-progress");
-
-      function handleScrollEffects() {
-        const scrollY = window.scrollY;
-        const windowHeight = window.innerHeight;
-        const docHeight = document.body.scrollHeight - windowHeight;
-        if(docHeight > 0) {
-            progressBar.style.width = `${(scrollY / docHeight) * 100}%`;
-        }
-        
-        if (!isMobile) {
-            blob1.style.transform = `translate3d(0, ${scrollY * 0.2}px, 0)`;
-            blob2.style.transform = `translate3d(0, ${scrollY * -0.2}px, 0)`;
-        }
-
-        if (storySection && storyCard && !isMobile) {
-            const rect = storySection.getBoundingClientRect();
-            let fraction = (windowHeight - rect.top) / (windowHeight + rect.height);
-            fraction = Math.max(0, Math.min(1, fraction));
-
-            // SCROLL SCRUBBING LOGIC (Applied for Mobile too now)
-            let rotation, opacity, translateY;
-            if (fraction <= 0.5) {
-                const progress = fraction * 2; 
-                rotation = -90 + (90 * progress);
-                opacity = progress;
-                translateY = 50 * (1 - progress);
-            } else {
-                const progress = (fraction - 0.5) * 2;
-                rotation = 0 + (90 * progress);
-                opacity = 1 - progress; 
-                translateY = -50 * progress;
-            }
-            // Use translate3d for GPU accel
-            storyCard.style.transform = `rotateX(${rotation}deg) translate3d(0, ${translateY}px, 0)`;
-            storyCard.style.opacity = Math.min(1, opacity + 0.2); 
-            
-            storyLines.forEach((line, index) => {
-                const triggerPoint = 0.2 + (index * 0.05);
-                if (fraction > triggerPoint) {
-                    line.style.opacity = 1;
-                    line.style.transform = `translate3d(0, 0, 0)`;
-                } else {
-                    line.style.opacity = 0;
-                    line.style.transform = `translate3d(0, 20px, 0)`;
-                }
-            });
-        }
-        rafId = null;
-      }
-
-      // --- MOBILE STORY OBSERVER ---
-      if (isMobile) {
-          const storyObserver = new IntersectionObserver((entries) => {
-              entries.forEach(entry => {
-                  if (entry.isIntersecting) {
-                      const card = entry.target.querySelector('.story-card');
-                      card.classList.add('mobile-active');
-                      const lines = entry.target.querySelectorAll('.story-line');
-                      lines.forEach((line, index) => {
-                          setTimeout(() => {
-                              line.style.opacity = 1;
-                              line.style.transform = 'translateY(0)';
-                          }, index * 200 + 500); 
-                      });
-                  }
-              });
-          }, { threshold: 0.3 });
-          storyObserver.observe(document.getElementById('story'));
-          
-          const counterObserver = new IntersectionObserver((entries) => {
-              entries.forEach(entry => {
-                  if(entry.isIntersecting) {
-                      const wrapper = entry.target.querySelector('.timer-wrapper');
-                      wrapper.classList.add('mobile-active');
-                  }
-              });
-          }, { threshold: 0.3 });
-          counterObserver.observe(document.getElementById('counter'));
-      }
-
-      // --- COUNTER LOGIC ---
-      function updateCounter() {
-        const now = new Date();
-        const diff = now - startDate;
-        if (diff >= 0) {
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-            document.getElementById('days-count').innerText = days;
-            document.getElementById('hours-count').innerText = hours < 10 ? '0' + hours : hours;
-            document.getElementById('minutes-count').innerText = minutes < 10 ? '0' + minutes : minutes;
-        }
-      }
-
-      // --- MAIN OBSERVER (Gallery, Counter, Final) ---
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if(entry.isIntersecting) {
-                if(entry.target.id === "gallery") {
-                    const title = entry.target.querySelector('.gallery-title');
-                    wrapText(title);
-                    anime.timeline().add({
-                        targets: '.gallery-title .letter',
-                        translateY: [50,0], opacity: [0,1],
-                        easing: "easeOutExpo", duration: 1000,
-                        delay: (el, i) => 30 * i
-                    });
-                    
-                    anime({
-                        targets: '.memory-card', opacity: [0,1], translateY: [50,0], 
-                        rotate: () => anime.random(-3, 3), 
-                        delay: anime.stagger(150), easing: 'easeOutQuad',
-                        complete: function(anim) {
-                            document.querySelectorAll('.memory-card').forEach(card => {
-                                const currentRotation = card.style.transform.match(/rotate\(([^)]+)\)/);
-                                const rot = currentRotation ? currentRotation[1] : '0deg';
-                                card.style.setProperty('--r', rot);
-                                card.classList.add('animate-idle');
-                                card.style.transform = ''; 
-                            });
-                        }
-                    });
-                    observer.unobserve(entry.target);
-                }
-                
-                if(entry.target.id === "counter") {
-                    const title = entry.target.querySelector('.counter-title');
-                    anime({ targets: title, opacity: [0,1], translateY: [20,0], duration: 1000 });
-
-                    updateCounter();
-                    setInterval(updateCounter, 1000);
-                    anime({ targets: '.timer-wrapper', opacity: [0,1], scale: [0.8, 1], easing: 'spring(1, 80, 10, 0)' });
-                    anime({
-                        targets: '.timer-wrapper', translateY: [-5, 5],
-                        direction: 'alternate', loop: true, duration: 3000, easing: 'easeInOutSine', delay: 1000
-                    });
-                    observer.unobserve(entry.target);
-                }
-
-                if(entry.target.id === "final") {
-                    anime({ targets: '.final-text', opacity: [0,1], translateY: [20,0], duration: 800 });
-                    anime({ targets: '#heart-btn', opacity: [0,1], scale: [0,1], delay: 300, duration: 1000 });
-                    anime({ targets: '.click-hint', opacity: [0,1], delay: 800, duration: 800 });
-                    observer.unobserve(entry.target);
-                }
-            }
-        });
-      }, { threshold: 0.15 });
-
-      document.querySelectorAll('#gallery, #counter, #final').forEach(sec => observer.observe(sec));
-
-      window.addEventListener('scroll', () => {
-        if (!rafId) { rafId = requestAnimationFrame(handleScrollEffects); }
-      }, { passive: true });
-      handleScrollEffects();
-
-      if (!isMobile) {
-        const dot = document.querySelector(".cursor-dot");
-        const outline = document.querySelector(".cursor-outline");
-        window.addEventListener("mousemove", (e) => {
-            dot.style.left = e.clientX + "px"; dot.style.top = e.clientY + "px";
-            outline.animate({ left: `${e.clientX}px`, top: `${e.clientY}px` }, { duration: 500, fill: "forwards" });
-        });
-      }
-
-      // Heart Explosion (WAAPI Optimized)
-      document.getElementById("heart-btn").addEventListener("click", (e) => {
-        const rect = e.target.getBoundingClientRect();
-        const x = rect.left + rect.width/2;
-        const y = rect.top + rect.height/2;
-        
-        e.target.animate([
-            { transform: 'scale(1)' },
-            { transform: 'scale(1.4)' },
-            { transform: 'scale(1)' }
-        ], { duration: 300, easing: 'ease-in-out' });
-
-        const count = isMobile ? 8 : 25; 
-        for(let i=0; i<count; i++) {
-            const p = document.createElement("div");
-            p.className = "particle";
-            p.style.left = x + "px"; p.style.top = y + "px";
-            document.body.appendChild(p);
-            
-            const angle = Math.random() * Math.PI * 2;
-            const velocity = Math.random() * 100 + 50;
-            const tx = Math.cos(angle) * velocity;
-            const ty = Math.sin(angle) * velocity;
-
-            const animation = p.animate([
-                { transform: `translate(0,0) scale(0)`, opacity: 1 },
-                { transform: `translate(${tx}px, ${ty}px) scale(1.5)`, opacity: 0 }
-            ], {
-                duration: Math.random() * 600 + 400,
-                easing: 'cubic-bezier(0, .9, .57, 1)'
-            });
-            
-            animation.onfinish = () => p.remove();
-        }
-      });
-    </script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel" src="script.js"></script>
   </body>
 </html>
