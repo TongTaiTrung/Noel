@@ -43,7 +43,7 @@ const memories = [
     date: "20/11/2025",
   },
 ];
-const startDate = new Date(2025, 9, 22, 7, 40, 0);
+const startDate = new Date(2025, 9, 21, 7, 40, 0);
 
 // SCROLL
 const lenis = new Lenis({
